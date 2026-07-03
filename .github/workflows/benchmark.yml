@@ -25,6 +25,10 @@ on:
         type: boolean
         default: true
 
+# Needed so full-benchmark can push results/ back to the repo.
+permissions:
+  contents: write
+
 jobs:
   smoke-test:
     if: github.event_name != 'workflow_dispatch'

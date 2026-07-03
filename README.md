@@ -27,20 +27,31 @@ no paid cloud, no persistent server required). No GPU. Just Arm CPUs, in CI.
 
 ---
 
-## Headline results (fill in after first run)
+## Headline results (real, from CI)
 
-Model: `meta-llama/Llama-3.2-3B` · Host: GitHub Actions `ubuntu-24.04-arm` (Ampere Altra, Neoverse N1, 4 vCPU) · llama.cpp `<commit>`
+Model: `Qwen/Qwen2.5-3B-Instruct` · Host: GitHub Actions `ubuntu-24.04-arm` (**Arm Neoverse N2**, 4 vCPU, `i8mm`+`sve2`) · llama.cpp `d4cff114c` · 4 threads
 
-| Config | Size (GB) | Prefill tok/s | Decode tok/s | TTFT (ms) | Peak RAM (GB) |
-|--------|----------:|--------------:|-------------:|----------:|--------------:|
-| FP16 (KleidiAI off) | – | – | – | – | – |
-| Q8_0 (KleidiAI off) | – | – | – | – | – |
-| Q4_K_M (KleidiAI off) | – | – | – | – | – |
-| Q4_0 (KleidiAI **off**) | – | – | – | – | – |
-| Q4_0 (KleidiAI **on**) | – | – | – | – | – |
+| Config | Size (GB) | Prefill tok/s | Decode tok/s | Peak RAM (GB) |
+|--------|----------:|--------------:|-------------:|--------------:|
+| F16 | 5.75 | 23.6 | 10.7 | 5.9 |
+| Q4_0 — naive (no Arm repack) | 1.70 | 27.9 | 14.0 | 1.9 |
+| Q4_0 — llama.cpp default Arm path | 1.70 | 70.3 | 19.6 | 3.5 |
+| Q4_0 — **KleidiAI** | 1.70 | 70.8 | 19.7 | 3.5 |
+| Q8_0 — KleidiAI **off** | 3.06 | 62.5 | 20.4 | 6.3 |
+| Q8_0 — **KleidiAI on** | 3.06 | **107.9** | **23.0** | 6.1 |
 
-**KleidiAI speedup (Q4_0):** prefill `–×`, decode `–×`. _Numbers populate automatically into
-`results/` when you run the harness._
+Three honest takeaways:
+
+- **KleidiAI's direct win is Q8_0: 1.73× prefill** (62.5 → 107.9 tok/s) — the fastest
+  config overall, because llama.cpp's default path doesn't repack Q8_0 and KleidiAI's
+  `i8mm` kernels do.
+- **Arm-optimized kernels vs naive (Q4_0): 2.5× prefill, 1.4× decode** — at Q4_0,
+  llama.cpp's default already ships Arm repack kernels that match KleidiAI within 1%;
+  the 3-way build comparison keeps that visible instead of hiding it.
+- **Quantization stacks on top: F16 → Q4_0 is 3.4× smaller and 3× faster prefill.**
+
+Full sweeps for Qwen2.5 0.5B / 1.5B / 3B (thread scaling, TTFT, RAM, all three builds)
+in [results/](results/), including the combined [leaderboard](results/leaderboard.md).
 
 ---
 
