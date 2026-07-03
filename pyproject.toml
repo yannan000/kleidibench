@@ -27,3 +27,6 @@ kleidibench = "kleidibench.cli:main"
 
 [tool.setuptools.packages.find]
 include = ["kleidibench*"]
+
+[tool.setuptools.package-data]
+kleidibench = ["data/*.txt"]

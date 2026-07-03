@@ -19,6 +19,38 @@ from . import util
 # Aggregation
 # --------------------------------------------------------------------------- #
 
+# Canonical build ordering + chart fills: naive baseline -> default Arm path ->
+# KleidiAI, so every chart reads left-to-right as "less optimized -> more".
+_BUILD_ORDER = ("repack-off", "kleidiai-off", "kleidiai-on")
+_BUILD_FILLS = {
+    "repack-off": "#94a3b8",    # gray — naive baseline
+    "kleidiai-off": "#66b2c2",  # light teal — llama.cpp default Arm path
+    "kleidiai-on": "#0b7285",   # dark teal — KleidiAI
+}
+
+
+def _thread_scaling(results: List[dict], quant: str = "Q4_0"):
+    """Group decode tok/s by thread count for one quant.
+
+    Returns (builds, groups) where groups is
+    [(group_label, [(build, decode_tps), ...]), ...] with threads ascending and
+    series in _BUILD_ORDER. Empty when there's nothing to scale (no rows for the
+    quant, or a single thread count — a one-cluster chart says nothing)."""
+    rows = [r for r in results if r["quant"] == quant]
+    threads = sorted({r["threads"] for r in rows})
+    if len(threads) < 2:
+        return [], []
+    builds = [b for b in _BUILD_ORDER if any(r["build"] == b for r in rows)]
+    groups = []
+    for t in threads:
+        series = []
+        for b in builds:
+            match = [r for r in rows if r["threads"] == t and r["build"] == b]
+            if match:
+                series.append((b, match[0]["decode_tps"]))
+        groups.append((f"{t} thr", series))
+    return builds, groups
+
 def kleidiai_speedup(results: List[dict], quant: str = "Q4_0") -> dict:
     """Compute speedups for a given quant at its best thread count.
 
@@ -121,6 +153,19 @@ def _markdown(model, results, host, meta, speedup) -> str:
         )
     lines += ["", f"_TTFT is derived from prefill throughput at "
                   f"{results[0]['n_prompt'] if results else 512}-token prompts._", ""]
+    builds, groups = _thread_scaling(results, "Q4_0")
+    if groups:
+        lines += [
+            "## Thread scaling (Q4_0 decode tok/s)",
+            "",
+            "| Threads | " + " | ".join(builds) + " |",
+            "|--------:|" + "".join("---:|" for _ in builds),
+        ]
+        for glabel, series in groups:
+            vals = dict(series)
+            cells = " | ".join(str(vals.get(b, "-")) for b in builds)
+            lines.append(f"| {glabel.split()[0]} | {cells} |")
+        lines.append("")
     return "\n".join(lines)
 
 
@@ -130,6 +175,9 @@ def _html(model, results, host, meta, speedup) -> str:
         [(f"{r['quant']}", r["decode_tps"]) for r in
          sorted(decode_rows, key=lambda x: x["decode_tps"])],
         title="Decode tok/s (KleidiAI on)")
+    _, scaling_groups = _thread_scaling(results, "Q4_0")
+    scaling_chart = _svg_grouped_bars(
+        scaling_groups, title="Thread scaling — decode tok/s (Q4_0)")
     speed_html = ""
     if speedup:
         naive_html = ""
@@ -178,6 +226,7 @@ border-radius:6px;margin:1rem 0}}
 {meta.get('timestamp')}</p>
 {speed_html}
 {chart}
+{scaling_chart}
 <table><thead><tr><th>Quant</th><th>Build</th><th>Threads</th><th>Size GB</th>
 <th>Prefill t/s</th><th>Decode t/s</th><th>TTFT ms</th><th>Peak RAM GB</th></tr></thead>
 <tbody>{trows}</tbody></table>
@@ -205,5 +254,64 @@ def _svg_bars(pairs, title="", width=760, bar_h=26, gap=10) -> str:
         parts.append(f'<text x="{label_w+w+pad}" y="{y+bar_h*0.7:.0f}" '
                      f'class="barlabel">{val}</text>')
         y += bar_h + gap
+    parts.append("</svg>")
+    return "".join(parts)
+
+
+def _svg_grouped_bars(groups, title="", width=760, plot_h=190, fills=None) -> str:
+    """Grouped vertical bars, pure inline SVG (no JS), same spirit as _svg_bars.
+
+    groups: [(group_label, [(series_label, value), ...]), ...] — one cluster per
+    group, one bar per series. A legend row sits above the plot; each bar gets a
+    value label on top and each cluster a label beneath the baseline."""
+    groups = [(g, s) for g, s in groups if s]
+    if not groups:
+        return ""
+    fills = fills or _BUILD_FILLS
+    series_labels: list = []
+    for _, series in groups:
+        for name, _ in series:
+            if name not in series_labels:
+                series_labels.append(name)
+    maxv = max(v for _, series in groups for _, v in series) or 1
+    pad = 8
+    title_h, legend_h = 28, 24
+    base = title_h + legend_h + plot_h          # y of the baseline
+    height = base + 26                          # room for group labels
+    plot_w = width - pad * 2
+    group_w = plot_w / len(groups)
+    parts = [f'<svg viewBox="0 0 {width} {height}" width="100%" '
+             f'xmlns="http://www.w3.org/2000/svg" role="img">',
+             f'<text x="0" y="20" class="barlabel" font-weight="700">{title}</text>']
+    # legend row
+    lx = pad
+    for name in series_labels:
+        fill = fills.get(name, "#0b7285")
+        parts.append(f'<rect x="{lx}" y="{title_h + 4}" width="12" height="12" '
+                     f'rx="2" fill="{fill}"/>')
+        parts.append(f'<text x="{lx + 17}" y="{title_h + 14}" '
+                     f'class="barlabel">{name}</text>')
+        lx += 17 + 7 * len(name) + 22
+    # clusters
+    bar_gap = 4
+    for gi, (glabel, series) in enumerate(groups):
+        n = len(series)
+        bar_w = min(48, (group_w - 24 - bar_gap * (n - 1)) / n)
+        cluster_w = bar_w * n + bar_gap * (n - 1)
+        x0 = pad + gi * group_w + (group_w - cluster_w) / 2
+        for si, (name, val) in enumerate(series):
+            # leave 16px headroom above the tallest bar for its value label
+            h = (plot_h - 16) * (val / maxv)
+            x = x0 + si * (bar_w + bar_gap)
+            parts.append(f'<rect x="{x:.1f}" y="{base - h:.1f}" '
+                         f'width="{bar_w:.1f}" height="{h:.1f}" rx="3" '
+                         f'fill="{fills.get(name, "#0b7285")}"/>')
+            parts.append(f'<text x="{x + bar_w / 2:.1f}" y="{base - h - 4:.1f}" '
+                         f'text-anchor="middle" class="barlabel">{val}</text>')
+        parts.append(f'<text x="{pad + gi * group_w + group_w / 2:.1f}" '
+                     f'y="{base + 18}" text-anchor="middle" '
+                     f'class="barlabel">{glabel}</text>')
+    parts.append(f'<line x1="{pad}" y1="{base}" x2="{width - pad}" y2="{base}" '
+                 f'stroke="#d7deea"/>')
     parts.append("</svg>")
     return "".join(parts)

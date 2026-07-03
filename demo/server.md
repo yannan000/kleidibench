@@ -56,3 +56,14 @@ streaming live, then flip to `report.html` to connect the demo's
 responsiveness back to the measured KleidiAI speedup. Headline line:
 *"This is running on a real Arm64 CPU that costs me nothing — no cloud
 account, no server to maintain."*
+
+## Browser chat UI
+
+Prefer a visual chat over the terminal? Open [`demo/chat.html`](chat.html)
+directly in a browser (or serve it with
+`python3 -m http.server 9000 --directory demo` if your browser blocks
+`fetch` from `file://`), point the Base URL field at the server
+(default `http://127.0.0.1:8080/v1`), and chat — tokens stream live with a
+TTFT / tok/s stat line under every response. Note the API key field must
+match what llama-server was started with: either launch with
+`--api-key demo-key` or clear the field if you omitted the flag.

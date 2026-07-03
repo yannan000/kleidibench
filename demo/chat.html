@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KleidiBench demo — LLM on a free Arm64 CPU</title>
+<style>
+  /* KleidiBench demo chat — self-contained, no external resources. */
+  :root {
+    --accent: #0b7285;
+    --accent-soft: rgba(11, 114, 133, 0.12);
+    --bg: #f5f7f8;
+    --panel: #ffffff;
+    --text: #1c2528;
+    --muted: #6b7a80;
+    --border: #dde4e7;
+    --user-bubble: #0b7285;
+    --user-text: #ffffff;
+    --asst-bubble: #ffffff;
+    --shadow: 0 1px 3px rgba(16, 42, 51, 0.10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --accent: #3aa8bd;
+      --accent-soft: rgba(58, 168, 189, 0.16);
+      --bg: #12181b;
+      --panel: #1b2327;
+      --text: #e4ebee;
+      --muted: #8fa1a8;
+      --border: #2b363b;
+      --user-bubble: #0b7285;
+      --user-text: #f2fbfd;
+      --asst-bubble: #1f292e;
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                 Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 20px 12px;
+    box-shadow: var(--shadow);
+    flex: none;
+    z-index: 2;
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  h1 {
+    font-size: 17px;
+    font-weight: 650;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  h1 .dot { color: var(--accent); }
+  #perf-badge {
+    font-size: 13px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    padding: 4px 12px;
+    white-space: nowrap;
+  }
+  #perf-badge.idle { opacity: 0.55; border-color: var(--border); color: var(--muted); background: transparent; }
+  .settings {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+  .settings label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .settings input {
+    font: inherit;
+    font-size: 13px;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 5px 9px;
+    outline: none;
+  }
+  .settings input:focus { border-color: var(--accent); }
+  #base-url { width: 240px; }
+  #api-key { width: 110px; }
+
+  main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 0 12px;
+  }
+  .chat-col {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .msg { display: flex; flex-direction: column; max-width: 82%; }
+  .msg.user { align-self: flex-end; align-items: flex-end; }
+  .msg.assistant { align-self: flex-start; align-items: flex-start; }
+  .bubble {
+    padding: 10px 14px;
+    border-radius: 16px;
+    font-size: 15px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    box-shadow: var(--shadow);
+  }
+  .msg.user .bubble {
+    background: var(--user-bubble);
+    color: var(--user-text);
+    border-bottom-right-radius: 5px;
+  }
+  .msg.assistant .bubble {
+    background: var(--asst-bubble);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 5px;
+  }
+  .stats {
+    margin-top: 5px;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .msg.system {
+    align-self: center;
+    max-width: 90%;
+  }
+  .msg.system .bubble {
+    background: transparent;
+    border: 1px dashed var(--muted);
+    color: var(--muted);
+    font-size: 13px;
+    box-shadow: none;
+    text-align: center;
+  }
+  .cursor {
+    display: inline-block;
+    width: 8px; height: 15px;
+    margin-left: 2px;
+    background: var(--accent);
+    vertical-align: text-bottom;
+    animation: blink 1s steps(2) infinite;
+    border-radius: 2px;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  .empty-hint {
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+    margin-top: 60px;
+    line-height: 1.7;
+  }
+  .empty-hint strong { color: var(--accent); }
+
+  footer {
+    flex: none;
+    background: var(--panel);
+    border-top: 1px solid var(--border);
+    padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
+  }
+  .input-row {
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+  }
+  #prompt {
+    flex: 1;
+    font: inherit;
+    font-size: 15px;
+    line-height: 1.4;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    resize: none;
+    outline: none;
+    max-height: 140px;
+  }
+  #prompt:focus { border-color: var(--accent); }
+  #send {
+    font: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    background: var(--accent);
+    border: none;
+    border-radius: 12px;
+    padding: 10px 22px;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+  }
+  #send:hover:not(:disabled) { filter: brightness(1.08); }
+  #send:disabled { opacity: 0.5; cursor: default; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <h1>KleidiBench demo <span class="dot">·</span> LLM on a free Arm64 CPU</h1>
+    <div id="perf-badge" class="idle">TTFT — · — tok/s</div>
+  </div>
+  <div class="settings">
+    <label>Base URL
+      <input id="base-url" type="text" value="http://127.0.0.1:8080/v1" spellcheck="false">
+    </label>
+    <label>API key
+      <input id="api-key" type="text" value="demo-key" spellcheck="false">
+    </label>
+  </div>
+</header>
+
+<main id="scroll-area">
+  <div class="chat-col" id="messages">
+    <div class="empty-hint" id="empty-hint">
+      Streaming chat against <strong>llama-server</strong> (llama.cpp, KleidiAI-accelerated)<br>
+      running on an Arm64 CPU. Type a message to start.
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="input-row">
+    <textarea id="prompt" rows="1"
+      placeholder="Ask something… (Enter to send, Shift+Enter for newline)"></textarea>
+    <button id="send">Send</button>
+  </div>
+</footer>
+
+<script>
+"use strict";
+
+const els = {
+  baseUrl: document.getElementById("base-url"),
+  apiKey: document.getElementById("api-key"),
+  messages: document.getElementById("messages"),
+  scrollArea: document.getElementById("scroll-area"),
+  prompt: document.getElementById("prompt"),
+  send: document.getElementById("send"),
+  badge: document.getElementById("perf-badge"),
+  emptyHint: document.getElementById("empty-hint"),
+};
+
+const conversation = [];   // {role, content} sent to the API
+let busy = false;
+
+function scrollToBottom() {
+  els.scrollArea.scrollTop = els.scrollArea.scrollHeight;
+}
+
+function addMessage(role, text) {
+  if (els.emptyHint) { els.emptyHint.remove(); els.emptyHint = null; }
+  const wrap = document.createElement("div");
+  wrap.className = "msg " + role;
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
+  bubble.textContent = text;
+  wrap.appendChild(bubble);
+  els.messages.appendChild(wrap);
+  scrollToBottom();
+  return { wrap, bubble };
+}
+
+function addSystem(text) {
+  addMessage("system", text);
+}
+
+function setBadge(ttftMs, tps) {
+  els.badge.classList.remove("idle");
+  els.badge.textContent =
+    "TTFT " + Math.round(ttftMs) + " ms · " + tps.toFixed(1) + " tok/s";
+}
+
+function fmtStats(ttftMs, tps, nTokens) {
+  return "TTFT " + Math.round(ttftMs) + " ms · " +
+         tps.toFixed(1) + " tok/s · " + nTokens + " tokens";
+}
+
+async function send() {
+  const text = els.prompt.value.trim();
+  if (!text || busy) return;
+  busy = true;
+  els.send.disabled = true;
+  els.prompt.value = "";
+  autosize();
+
+  addMessage("user", text);
+  conversation.push({ role: "user", content: text });
+
+  const { bubble, wrap } = addMessage("assistant", "");
+  const cursor = document.createElement("span");
+  cursor.className = "cursor";
+  bubble.appendChild(cursor);
+
+  const t0 = performance.now();
+  let firstTokenAt = null;
+  let lastTokenAt = null;
+  let nTokens = 0;
+  let full = "";
+
+  const baseUrl = els.baseUrl.value.trim().replace(/\/+$/, "");
+  const headers = { "Content-Type": "application/json" };
+  const key = els.apiKey.value.trim();
+  if (key) headers["Authorization"] = "Bearer " + key;
+
+  const appendDelta = (delta) => {
+    if (firstTokenAt === null) firstTokenAt = performance.now();
+    lastTokenAt = performance.now();
+    nTokens++;
+    full += delta;
+    bubble.textContent = full;
+    bubble.appendChild(cursor);
+    scrollToBottom();
+  };
+
+  try {
+    const resp = await fetch(baseUrl + "/chat/completions", {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        model: "local",
+        stream: true,
+        messages: conversation,
+      }),
+    });
+    if (!resp.ok) {
+      throw new Error("HTTP " + resp.status + " " + resp.statusText);
+    }
+
+    // Incremental SSE parse: buffer bytes, split on newlines, keep the
+    // trailing partial line for the next read.
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let done = false;
+
+    while (!done) {
+      const chunk = await reader.read();
+      if (chunk.done) break;
+      buffer += decoder.decode(chunk.value, { stream: true });
+      let nl;
+      while ((nl = buffer.indexOf("\n")) !== -1) {
+        const line = buffer.slice(0, nl).trim();
+        buffer = buffer.slice(nl + 1);
+        if (!line.startsWith("data:")) continue;
+        const body = line.slice(5).trim();
+        if (body === "[DONE]") { done = true; break; }
+        let obj;
+        try { obj = JSON.parse(body); } catch { continue; }
+        const delta = obj.choices && obj.choices[0] &&
+                      obj.choices[0].delta && obj.choices[0].delta.content;
+        if (delta) appendDelta(delta);
+      }
+    }
+
+    cursor.remove();
+
+    if (nTokens > 0) {
+      conversation.push({ role: "assistant", content: full });
+      const ttftMs = firstTokenAt - t0;
+      const genSec = Math.max((lastTokenAt - firstTokenAt) / 1000, 1e-3);
+      const tps = nTokens > 1 ? (nTokens - 1) / genSec : nTokens / genSec;
+      const stats = document.createElement("div");
+      stats.className = "stats";
+      stats.textContent = fmtStats(ttftMs, tps, nTokens);
+      wrap.appendChild(stats);
+      setBadge(ttftMs, tps);
+    } else {
+      wrap.remove();
+      conversation.pop(); // keep history consistent with what the model saw
+      addSystem("The server responded but sent no tokens — check the model is loaded.");
+    }
+  } catch (err) {
+    cursor.remove();
+    wrap.remove();
+    conversation.pop();
+    addSystem("Can't reach the server — is llama-server running? See server.md (" +
+              (err && err.message ? err.message : err) + ")");
+  } finally {
+    busy = false;
+    els.send.disabled = false;
+    els.prompt.focus();
+    scrollToBottom();
+  }
+}
+
+function autosize() {
+  els.prompt.style.height = "auto";
+  els.prompt.style.height = Math.min(els.prompt.scrollHeight, 140) + "px";
+}
+
+els.send.addEventListener("click", send);
+els.prompt.addEventListener("input", autosize);
+els.prompt.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    send();
+  }
+});
+els.prompt.focus();
+</script>
+</body>
+</html>

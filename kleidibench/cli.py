@@ -15,6 +15,7 @@ from typing import List, Optional
 
 from . import util, build as build_mod, quantize as quant_mod, bench as bench_mod
 from . import report as report_mod, perfix as perfix_mod, leaderboard as lb_mod
+from . import quality as quality_mod
 
 
 def _thread_counts(host, override: Optional[List[int]]) -> List[int]:
@@ -51,13 +52,30 @@ def cmd_run(args) -> int:
     for art in arts:
         # F16 only runs once (neither repack nor KleidiAI touch it); quantized
         # weights get the full 3-way comparison: naive -> repack -> KleidiAI.
-        build_variants = ["off"] if art.quant == "F16" else ["naive", "off", "on"]
+        # F16 is also benched only at max threads — it is the size/quality
+        # baseline, and its 1-thread runs dominate wall-clock on 3B+ models.
+        f16 = art.quant == "F16"
+        build_variants = ["off"] if f16 else ["naive", "off", "on"]
+        art_threads = [threads[-1]] if f16 else threads
         for bv in build_variants:
-            for t in threads:
+            for t in art_threads:
                 res = bench_mod.run_bench(builds[bv], art, threads=t,
                                           n_prompt=args.n_prompt, n_gen=args.n_gen,
                                           reps=args.reps)
                 results.append(res.to_dict())
+
+    # Optional quality pass: perplexity per quant (F16 included as the
+    # reference point). KleidiAI does not change the math, only the speed, so
+    # one build's binary suffices; max threads keeps the pass short.
+    if args.quality:
+        corpus = quality_mod.get_corpus()
+        for art in arts:
+            ppl = quality_mod.measure_perplexity(
+                builds["off"].llama_perplexity, art.path, corpus,
+                threads=threads[-1])
+            for row in results:
+                if row["quant"] == art.quant:
+                    row["ppl"] = ppl
 
     # Optional Arm Performix deep profile on the Q4_0 / KleidiAI-on best case.
     if args.perfix:
@@ -123,6 +141,8 @@ def build_parser() -> argparse.ArgumentParser:
     common.add_argument("--llama-ref", default=None, help="pin a llama.cpp git ref")
     common.add_argument("--local-dir", default=None, help="use a pre-downloaded HF dir")
     common.add_argument("--perfix", action="store_true", help="capture Arm Performix profile")
+    common.add_argument("--quality", action="store_true",
+                        help="measure perplexity per quant (slower)")
     common.add_argument("--allow-non-arm", action="store_true",
                         help="run on a non-Arm host (dev/testing only)")
 
