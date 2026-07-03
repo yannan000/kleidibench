@@ -23,9 +23,11 @@ If you haven't already run `kleidibench run <model>` in this session, do that
 first so the KleidiAI-on binary and GGUF exist. Then:
 
 ```bash
-# paths follow the KleidiBench cache layout (~/.kleidibench)
+# paths follow the KleidiBench cache layout (~/.kleidibench).
+# Q8_0 + KleidiAI is the measured-fastest config (1.73x prefill vs KleidiAI
+# off on Neoverse N2) — serve the one that won the leaderboard.
 ~/.kleidibench/build-kleidiai-on/bin/llama-server \
-  -m ~/.kleidibench/models/<model>-Q4_0.gguf \
+  -m ~/.kleidibench/models/<model>-Q8_0.gguf \
   --host 127.0.0.1 --port 8080 \
   -t $(nproc) -c 4096 \
   --api-key demo-key            # optional; matches demo_client.py

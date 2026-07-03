@@ -54,6 +54,8 @@ Three honest takeaways:
 
 Full sweeps for Qwen2.5 0.5B / 1.5B / 3B (thread scaling, TTFT, RAM, all three builds)
 in [results/](results/), including the combined [leaderboard](results/leaderboard.md).
+The full analysis — including why on/off-only benchmarks get this wrong — is in
+**[docs/FINDINGS.md](docs/FINDINGS.md)**.
 
 ---
 

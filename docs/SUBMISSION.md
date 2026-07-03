@@ -110,5 +110,6 @@ tmate · Arm Performix (optional deep profiling)
 ## Links
 
 - Repo: https://github.com/yannan000/kleidibench (public, MIT)
+- Findings writeup (learning-ready): [docs/FINDINGS.md](FINDINGS.md)
 - Demo video: [[YOUTUBE LINK]]
 - CI runs (live benchmark evidence): https://github.com/yannan000/kleidibench/actions

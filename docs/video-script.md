@@ -8,13 +8,14 @@ on-screen captions.
 ## Shot list
 
 ### 0:00–0:20 — The hook (report.html, already open)
-Show `results/<model>/report.html` full screen. Cursor circles the speedup
-callout.
+Show `results/Qwen2.5-3B-Instruct/report.html` full screen. Cursor circles the
+Q8_0 speedup callout.
 
-> "This is the same model, same machine, same llama.cpp commit. The only
-> difference is one CMake flag — Arm's KleidiAI kernels. Prefill is
-> [[X.XX]] times faster, decode [[X.XX]] times. This video shows the tool
-> that measures it, and the free Arm hardware it runs on."
+> "Same model, same machine, same llama.cpp commit. The only difference is one
+> CMake flag — Arm's KleidiAI kernels — and prompt processing jumps from 62 to
+> 108 tokens a second. 1.7 times faster. This video shows the tool that
+> measures it, a finding most benchmarks miss, and the free Arm hardware it
+> all runs on."
 
 ### 0:20–0:50 — One command (terminal)
 Type (don't paste) the command; time-lapse or jump-cut the run.
@@ -23,9 +24,11 @@ Type (don't paste) the command; time-lapse or jump-cut the run.
 kleidibench run Qwen/Qwen2.5-0.5B-Instruct
 ```
 
-> "KleidiBench builds llama.cpp twice — KleidiAI on and off — quantizes any
-> Hugging Face model down the F16 → Q8 → Q4 curve, benchmarks every
-> combination, and writes the report you just saw."
+> "KleidiBench builds llama.cpp three ways — a naive build, llama.cpp's
+> default Arm path, and KleidiAI — quantizes any Hugging Face model down the
+> F16 → Q8 → Q4 curve, benchmarks every combination, and writes the report you
+> just saw. The three-way build is the point: it caught that at Q4, llama.cpp's
+> default already matches KleidiAI — the real flag win lives at Q8."
 
 ### 0:50–1:30 — The free Arm part (browser: GitHub Actions tab)
 Show the Actions run list, click into an arm64 job, point at `uname -m` →
@@ -47,8 +50,10 @@ Let the tokens stream on camera; the client prints TTFT + tok/s at the end —
 zoom on that line.
 
 > "And it's not just a benchmark — this is llama.cpp's OpenAI-compatible
-> server running the KleidiAI-accelerated build, live, on that same free Arm
-> runner. [[NN]] tokens a second, on a CPU, at zero dollars."
+> server running the KleidiAI Q8_0 build — the config that won the leaderboard
+> — live, on that same free Arm runner. Twenty-three tokens a second from a
+> 3B model on a 4-core CPU, at zero dollars." *(Or use the 0.5B for a snappier
+> on-camera feel: 132 tok/s.)*
 
 ### 2:20–2:50 — The leaderboard + close (browser: leaderboard.html)
 Show the multi-model leaderboard, scroll the table.
