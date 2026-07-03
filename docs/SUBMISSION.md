@@ -84,8 +84,9 @@ Full sweep (quant curve, thread scaling, RAM, TTFT) in
   for running Arm performance tests on free arm64 runners (smoke test on every
   push; full sweep on manual dispatch that commits results back).
 - **The live demo**: `llama.cpp`'s OpenAI-compatible server running the
-  KleidiAI-accelerated Q4_0 model on an arm64 runner, driven by
-  `demo/demo_client.py` with streaming + TTFT/tok-s stats
+  KleidiAI Q8_0 build (the measured-fastest config) on an arm64 runner, driven
+  by a self-contained browser chat UI (`demo/chat.html`) showing live TTFT and
+  tok/s per response, or the terminal client (`demo/demo_client.py`)
   (`demo-session.yml` opens the interactive session).
 
 ## Setup instructions

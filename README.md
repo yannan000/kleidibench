@@ -104,7 +104,7 @@ kleidibench run <hf-model>
 |------|------|
 | `kleidibench/` | the harness (Python) |
 | `configs/` | sweep definitions (models, quant list, thread counts) |
-| `demo/` | generic OpenAI-compatible chatbot endpoint served from the Arm runner |
+| `demo/` | OpenAI-compatible endpoint on the Arm runner + browser chat UI ([chat.html](demo/chat.html)) with live TTFT/tok-s stats |
 | `results/` | committed report artifacts (tables, charts, leaderboard) |
 | `.github/workflows/` | `benchmark.yml` (CI smoke test + full sweep), `demo-session.yml` (live SSH for the demo video) |
 | `scripts/` | provisioning helper for an optional persistent Arm box (Oracle) |
