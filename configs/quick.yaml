@@ -1,0 +1,12 @@
+# Fast smoke-test sweep: one tiny model, minimal reps. Use to validate the
+# whole pipeline end-to-end on a fresh box before the real leaderboard run.
+#   kleidibench sweep configs/quick.yaml
+
+models:
+  - meta-llama/Llama-3.2-1B
+
+quants:
+  - Q4_0
+
+threads:
+  - 2

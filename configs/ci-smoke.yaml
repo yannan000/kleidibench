@@ -1,0 +1,16 @@
+# CI-only smoke config: runs on GitHub Actions arm64 runners with no secrets
+# required, so it works on every push without an HF_TOKEN. Uses an ungated
+# tiny model and a single quant/thread point purely to prove the pipeline
+# (build -> convert -> quantize -> bench -> report) works end-to-end on Arm.
+#
+# The real benchmark numbers come from configs/quick.yaml / leaderboard.yaml,
+# run via the "full-benchmark" workflow_dispatch job with HF_TOKEN set.
+
+models:
+  - Qwen/Qwen2.5-0.5B-Instruct   # ungated, tiny -> fast CI
+
+quants:
+  - Q4_0
+
+threads:
+  - 2

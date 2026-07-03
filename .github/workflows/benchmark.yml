@@ -1,0 +1,116 @@
+name: benchmark
+
+# Runs KleidiBench on GitHub's free arm64-hosted runners (ubuntu-24.04-arm),
+# generally available and free for public repos: real Arm64 CPU, no paid
+# cloud, no account provisioning. This IS the "Arm platform" for this project.
+#
+#   smoke-test    -> every push/PR. Tiny ungated model, proves the whole
+#                    pipeline (build x2, convert, quantize, bench, report)
+#                    works on Arm. No secrets required.
+#   full-benchmark -> manual only (workflow_dispatch). Runs the real
+#                    headline sweep and commits results/ back to the repo.
+
+on:
+  push:
+    paths: ["kleidibench/**", "configs/**", ".github/workflows/benchmark.yml"]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      config:
+        description: "Sweep config to run"
+        required: false
+        default: "configs/quick.yaml"
+      commit_results:
+        description: "Commit results/ back to the repo"
+        type: boolean
+        default: true
+
+jobs:
+  smoke-test:
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Confirm Arm64 host
+        run: |
+          uname -m
+          cat /proc/cpuinfo | grep -m1 'Features\|features' || true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install system deps
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y build-essential cmake time
+
+      - name: Cache llama.cpp build
+        uses: actions/cache@v4
+        with:
+          path: ~/.kleidibench
+          key: kleidibench-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('kleidibench/kleidibench/build.py') }}
+
+      - name: Install kleidibench
+        run: python -m pip install -e ".[hf]"
+
+      - name: Run smoke sweep (ungated tiny model)
+        run: kleidibench sweep configs/ci-smoke.yaml
+
+      - name: Upload report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kleidibench-smoke-report
+          path: results/**
+
+  full-benchmark:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Confirm Arm64 host
+        run: uname -m
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install system deps
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y build-essential cmake time
+
+      - name: Cache llama.cpp build
+        uses: actions/cache@v4
+        with:
+          path: ~/.kleidibench
+          key: kleidibench-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('kleidibench/kleidibench/build.py') }}
+
+      - name: Install kleidibench
+        run: python -m pip install -e ".[hf]"
+
+      - name: Run benchmark sweep
+        # HF_TOKEN is optional: only needed for gated models (e.g. Llama).
+        # Set it in repo Settings -> Secrets and variables -> Actions.
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: kleidibench sweep ${{ github.event.inputs.config }}
+
+      - name: Upload report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kleidibench-full-report
+          path: results/**
+
+      - name: Commit results back to repo
+        if: ${{ github.event.inputs.commit_results == 'true' }}
+        run: |
+          git config user.name "kleidibench-bot"
+          git config user.email "actions@github.com"
+          git add results/
+          git diff --cached --quiet || git commit -m "ci: update benchmark results [skip ci]"
+          git push

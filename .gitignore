@@ -1,0 +1,20 @@
+# Build/cache (lives in ~/.kleidibench by default, but ignore local copies too)
+.kleidibench/
+build-kleidiai-*/
+*.gguf
+models/
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+kb-venv/
+build/
+dist/
+
+# OS
+.DS_Store
+
+# Keep committed report artifacts under results/, but ignore stray large files
+results/**/*.gguf

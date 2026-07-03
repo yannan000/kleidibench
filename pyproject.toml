@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kleidibench"
+version = "0.1.0"
+description = "One-command benchmark harness for LLM inference on Arm with KleidiAI + llama.cpp"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Yoofi Annan" }]
+keywords = ["arm", "kleidiai", "llama.cpp", "benchmark", "quantization", "neoverse"]
+
+# Deliberately dependency-light so it installs on a bare free-tier Arm VM.
+# PyYAML is the only hard requirement; everything else is stdlib.
+dependencies = [
+    "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+# Only needed if you want HF model download/convert on the box itself.
+hf = ["huggingface_hub>=0.23", "requests>=2.31"]
+
+[project.scripts]
+kleidibench = "kleidibench.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["kleidibench*"]
