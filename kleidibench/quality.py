@@ -3,7 +3,7 @@
 Quantization trades accuracy for size/speed; perplexity over a fixed text is
 the cheapest way to put a number on that loss so the report can show the full
 size-vs-speed-vs-quality curve. We run llama-perplexity with a small chunk
-budget (--chunks 8) so the sweep stays tolerable on free-tier Arm VMs — the
+budget (--chunks 4) so the sweep stays tolerable on free-tier Arm VMs — the
 absolute PPL is corpus-dependent anyway; what matters is the delta between
 F16 and each quant on the SAME corpus.
 
@@ -18,9 +18,10 @@ from typing import Optional
 
 from . import util
 
-# Keep the run short: 8 chunks of the default 512-token context is enough to
+# Keep the run short, and within the bundled corpus: ~1.9K words tokenizes to
+# roughly 2.5K tokens, which supports 4 full 512-token chunks — enough to
 # separate F16 from Q4_0 while staying under a couple of minutes on small cores.
-CHUNKS = 8
+CHUNKS = 4
 
 
 def get_corpus() -> Path:
@@ -48,7 +49,9 @@ def measure_perplexity(perplexity_bin: Path, model_path: Path, corpus: Path,
         util.log(f"perplexity run failed for {model_path.name}: {e}")
         return None
 
-    out = proc.stdout or ""
+    # llama-perplexity has printed the estimate to stderr in some releases and
+    # stdout in others — search both (util.run captures them separately).
+    out = (proc.stdout or "") + "\n" + (proc.stderr or "")
     if proc.returncode != 0:
         util.log(f"llama-perplexity exited {proc.returncode} for "
                  f"{model_path.name}:\n{out[-500:]}")

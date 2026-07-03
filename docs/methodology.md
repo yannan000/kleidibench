@@ -52,10 +52,13 @@ averaged `avg_ts` it reports. Defaults: `-p 512 -n 128`.
 
 ## Quality (perplexity) — optional
 
-Quantization trades quality for size/speed. To show the tradeoff honestly, run
-`llama-perplexity` (built alongside) on a fixed corpus (e.g. wikitext-2) per
-quant and add the column. KleidiBench builds the binary; the sweep hook is left
-as a documented follow-up so a base run stays fast on the free tier.
+Quantization trades quality for size/speed. With `--quality` (or `quality:
+true` in a sweep config), KleidiBench runs `llama-perplexity --chunks 4` per
+quant on a small bundled corpus (`kleidibench/data/corpus.txt`, no network
+needed) and adds a Perplexity column to the report. Absolute PPL is
+corpus-dependent; the meaningful signal is the **delta** between F16 and each
+quant on the same corpus. Quality is measured once per quant on the default
+build — quantization changes the math, KleidiAI only changes the speed.
 
 ## Arm Performix (optional deep profile)
 

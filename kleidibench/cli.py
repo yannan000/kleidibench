@@ -19,12 +19,20 @@ from . import quality as quality_mod
 
 
 def _thread_counts(host, override: Optional[List[int]]) -> List[int]:
-    if override:
-        return override
     c = host.cores
+    if override:
+        # Clamp to host cores: oversubscribed thread counts quietly degrade
+        # tok/s and would get published as the platform's numbers. Sorted so
+        # threads[-1] is always the max.
+        clamped = sorted({t for t in override if 1 <= t <= c})
+        dropped = sorted(set(override) - set(clamped))
+        if dropped:
+            util.log(f"ignoring thread counts beyond host cores ({c}): {dropped}")
+        if clamped:
+            return clamped
+        util.log("no valid thread counts in override; using defaults")
     # A small scaling curve that always includes the full-core point.
-    pts = sorted({1, max(1, c // 2), c})
-    return [t for t in pts if t <= c]
+    return sorted({1, max(1, c // 2), c})
 
 
 def cmd_run(args) -> int:
@@ -35,8 +43,12 @@ def cmd_run(args) -> int:
                  f"for Arm64. Re-run on the Arm box, or pass --allow-non-arm to force.")
         return 2
 
-    quants = args.quants.split(",") if args.quants else quant_mod.DEFAULT_QUANTS
-    threads = _thread_counts(host, [int(t) for t in args.threads.split(",")] if args.threads else None)
+    quants = ([q.strip() for q in args.quants.split(",") if q.strip()]
+              if args.quants else quant_mod.DEFAULT_QUANTS)
+    threads = _thread_counts(
+        host,
+        [int(t.strip()) for t in args.threads.split(",") if t.strip()]
+        if args.threads else None)
 
     util.log(f"host: {host.cpu_model} | {host.cores} cores | "
              f"features={host.features} | threads={threads} | quants={quants}")
@@ -102,15 +114,23 @@ def cmd_sweep(args) -> int:
         util.log(f"no models in {args.config}")
         return 2
     rc = 0
-    for m in models:
-        sub = argparse.Namespace(**vars(args))
-        sub.model = m if isinstance(m, str) else m["repo"]
-        sub.local_dir = None if isinstance(m, str) else m.get("local_dir")
-        sub.quants = cfg.get("quants") and ",".join(cfg["quants"]) or args.quants
-        sub.threads = cfg.get("threads") and ",".join(map(str, cfg["threads"])) or args.threads
-        sub.quality = cfg.get("quality", args.quality)
-        rc |= cmd_run(sub)
-    lb_mod.build_leaderboard(price_per_hour=cfg.get("price_per_hour", 0.0))
+    try:
+        for m in models:
+            sub = argparse.Namespace(**vars(args))
+            sub.model = m if isinstance(m, str) else m["repo"]
+            sub.local_dir = None if isinstance(m, str) else m.get("local_dir")
+            sub.quants = cfg.get("quants") and ",".join(cfg["quants"]) or args.quants
+            sub.threads = cfg.get("threads") and ",".join(map(str, cfg["threads"])) or args.threads
+            sub.quality = cfg.get("quality", args.quality)
+            # One flaky model (download 429, convert crash) must not discard
+            # hours of completed benchmarks from the other models.
+            try:
+                rc |= cmd_run(sub)
+            except Exception as e:
+                util.log(f"model {sub.model} FAILED: {e} — continuing sweep")
+                rc |= 1
+    finally:
+        lb_mod.build_leaderboard(price_per_hour=cfg.get("price_per_hour", 0.0))
     return rc
 
 

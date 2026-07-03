@@ -56,20 +56,34 @@ def _download_hf(hf_repo: str) -> Path:
     return Path(local)
 
 
+_CONVERT_MODULES = ("torch", "gguf", "transformers", "sentencepiece")
+
+
 def _ensure_convert_deps() -> None:
     """convert_hf_to_gguf.py needs torch/transformers/gguf etc. Install
     llama.cpp's own pinned requirements file on first use so the harness works
     on a bare host (CI runner, fresh VM) without a manual pip step."""
-    if importlib.util.find_spec("torch") and importlib.util.find_spec("gguf"):
+    if all(importlib.util.find_spec(m) for m in _CONVERT_MODULES):
         return
     req = util.LLAMA_SRC / "requirements" / "requirements-convert_hf_to_gguf.txt"
     if req.exists():
         util.log("installing llama.cpp converter requirements (torch etc.) ...")
-        util.run([sys.executable, "-m", "pip", "install", "-q", "-r", str(req)])
+        pip_args = ["-r", str(req)]
     else:  # older checkouts shipped a single top-level requirements.txt
-        util.run([sys.executable, "-m", "pip", "install", "-q",
-                  "torch", "numpy", "sentencepiece", "transformers",
-                  "gguf", "protobuf"])
+        pip_args = ["torch", "numpy", "sentencepiece", "transformers",
+                    "gguf", "protobuf"]
+    proc = util.run([sys.executable, "-m", "pip", "install", "-q", *pip_args],
+                    capture=True, check=False)
+    if proc.returncode != 0:
+        # PEP 668: system Pythons refuse pip installs outside a venv.
+        if "externally-managed-environment" in (proc.stderr or "") + (proc.stdout or ""):
+            raise SystemExit(
+                "pip refused to install into this externally-managed Python "
+                "(PEP 668). Create a venv first:\n"
+                "  python3 -m venv ~/kb-venv && source ~/kb-venv/bin/activate\n"
+                "  pip install -e . && re-run kleidibench")
+        raise SystemExit(f"converter dependency install failed:\n"
+                         f"{(proc.stderr or '')[-800:]}")
 
 
 def convert_to_f16(hf_repo: str, local_dir: Optional[Path] = None) -> ModelArtifact:
@@ -86,8 +100,13 @@ def convert_to_f16(hf_repo: str, local_dir: Optional[Path] = None) -> ModelArtif
     out = util.MODELS / f"{name}-F16.gguf"
     if not out.exists():
         _ensure_convert_deps()
-        util.run([sys.executable, str(convert), str(src), "--outfile", str(out),
+        # Write to a temp path and rename on success: a run killed mid-write
+        # (CI timeout, OOM) must not leave a truncated .gguf that later runs
+        # silently reuse.
+        tmp = out.with_suffix(".gguf.tmp")
+        util.run([sys.executable, str(convert), str(src), "--outfile", str(tmp),
                   "--outtype", "f16"])
+        tmp.replace(out)
     return _artifact(name, "F16", out)
 
 
@@ -97,7 +116,9 @@ def quantize(f16: ModelArtifact, quants: List[str], quantize_bin: Path) -> List[
     for q in quants:
         out = util.MODELS / f"{f16.name}-{q}.gguf"
         if not out.exists():
-            util.run([str(quantize_bin), str(f16.path), str(out), q])
+            tmp = out.with_suffix(".gguf.tmp")   # atomic: see convert_to_f16
+            util.run([str(quantize_bin), str(f16.path), str(tmp), q])
+            tmp.replace(out)
         arts.append(_artifact(f16.name, q, out))
     return arts
 

@@ -31,10 +31,10 @@ def collect(results_dir: Optional[Path] = None) -> List[dict]:
 
 
 def best_row(results: List[dict]) -> Optional[dict]:
-    """Best decode config for a model: prefer KleidiAI-on rows, then max tok/s."""
-    on = [r for r in results if r["build"] == "kleidiai-on"]
-    pool = on or results
-    return max(pool, key=lambda r: r["decode_tps"], default=None)
+    """Best decode config for a model: the true max across ALL builds.
+    The build column in the table says which variant won — restricting to
+    KleidiAI-on rows could hide a faster default-path config."""
+    return max(results, key=lambda r: r["decode_tps"], default=None)
 
 
 def cost_per_mtok(decode_tps: float, price_per_hour: float) -> float:
@@ -66,7 +66,7 @@ def build_leaderboard(price_per_hour: float = 0.0,
             "size_gb": best["size_gb"],
             "prefill_tps": best["prefill_tps"],
             "decode_tps": best["decode_tps"],
-            "ttft_ms": best["ttft_ms"],
+            "ttft_ms": best["ttft_ms"] if best.get("ttft_ms") is not None else "-",
             "kleidiai_decode_speedup": speed.get("decode_speedup", "-"),
             "cost_per_mtok": cost_per_mtok(best["decode_tps"], price_per_hour),
             "host": run.get("host", {}).get("cpu_model", "?"),

@@ -18,6 +18,6 @@ threads:
   - 2
   - 4
 
-# Measure perplexity per quant (llama-perplexity, --chunks 8) so reports show
+# Measure perplexity per quant (llama-perplexity, --chunks 4) so reports show
 # the size/speed/QUALITY tradeoff, not just speed.
 quality: true

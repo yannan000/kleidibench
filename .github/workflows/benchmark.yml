@@ -55,13 +55,17 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.kleidibench
-          key: kleidibench-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('kleidibench/kleidibench/build.py') }}
+          key: kleidibench-v2-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('kleidibench/build.py') }}
 
       - name: Install kleidibench
         run: python -m pip install -e ".[hf]"
 
       - name: Run smoke sweep (ungated tiny model)
-        run: kleidibench sweep configs/ci-smoke.yaml
+        # Scrub committed results first so the smoke artifact + leaderboard
+        # contain only data this run produced (nothing is committed back here).
+        run: |
+          find results -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} +
+          kleidibench sweep configs/ci-smoke.yaml
 
       - name: Upload report artifact
         uses: actions/upload-artifact@v4
@@ -92,7 +96,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.kleidibench
-          key: kleidibench-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('kleidibench/kleidibench/build.py') }}
+          key: kleidibench-v2-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('kleidibench/build.py') }}
 
       - name: Install kleidibench
         run: python -m pip install -e ".[hf]"
@@ -100,9 +104,12 @@ jobs:
       - name: Run benchmark sweep
         # HF_TOKEN is optional: only needed for gated models (e.g. Llama).
         # Set it in repo Settings -> Secrets and variables -> Actions.
+        # CONFIG goes through an env var, not template interpolation into the
+        # shell line.
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: kleidibench sweep ${{ github.event.inputs.config }}
+          CONFIG: ${{ github.event.inputs.config }}
+        run: kleidibench sweep "$CONFIG"
 
       - name: Upload report artifact
         uses: actions/upload-artifact@v4

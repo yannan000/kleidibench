@@ -52,24 +52,28 @@ def _thread_scaling(results: List[dict], quant: str = "Q4_0"):
     return builds, groups
 
 def kleidiai_speedup(results: List[dict], quant: str = "Q4_0") -> dict:
-    """Compute speedups for a given quant at its best thread count.
+    """Compute speedups for a given quant, like-for-like: all builds compared
+    at the SAME thread count (the max shared by on and off rows). Picking each
+    build's own best threads independently could inflate the ratio if one
+    scales worse under contention.
 
     Two comparisons: KleidiAI-on vs llama.cpp's default Arm path (kleidiai-off),
-    and — when a repack-off naive run exists — Arm-optimized-total vs naive,
-    which shows the full journey from generic kernels to KleidiAI."""
-    on = _best(results, quant, "kleidiai-on")
-    off = _best(results, quant, "kleidiai-off")
-    if not on or not off:
+    and — when a repack-off naive run exists at that thread count —
+    Arm-optimized-total vs naive, the full journey from generic kernels."""
+    t = _max_shared_threads(results, quant, "kleidiai-on", "kleidiai-off")
+    if t is None:
         return {}
+    on = _at(results, quant, "kleidiai-on", t)
+    off = _at(results, quant, "kleidiai-off", t)
     out = {
         "quant": quant,
         "prefill_on": on["prefill_tps"], "prefill_off": off["prefill_tps"],
         "decode_on": on["decode_tps"], "decode_off": off["decode_tps"],
         "prefill_speedup": _ratio(on["prefill_tps"], off["prefill_tps"]),
         "decode_speedup": _ratio(on["decode_tps"], off["decode_tps"]),
-        "threads": on["threads"],
+        "threads": t,
     }
-    naive = _best(results, quant, "repack-off")
+    naive = _at(results, quant, "repack-off", t)
     if naive:
         out.update({
             "prefill_naive": naive["prefill_tps"],
@@ -80,9 +84,19 @@ def kleidiai_speedup(results: List[dict], quant: str = "Q4_0") -> dict:
     return out
 
 
-def _best(results, quant, build):
-    rows = [r for r in results if r["quant"] == quant and r["build"] == build]
-    return max(rows, key=lambda r: r["decode_tps"], default=None)
+def _max_shared_threads(results, quant, *builds):
+    """Highest thread count at which every named build has a row for quant."""
+    sets = [{r["threads"] for r in results
+             if r["quant"] == quant and r["build"] == b} for b in builds]
+    shared = set.intersection(*sets) if sets else set()
+    return max(shared) if shared else None
+
+
+def _at(results, quant, build, threads):
+    for r in results:
+        if r["quant"] == quant and r["build"] == build and r["threads"] == threads:
+            return r
+    return None
 
 
 def _ratio(a, b):
@@ -158,15 +172,17 @@ def _markdown(model, results, host, meta, speedups) -> str:
     ]
     for r in sorted(results, key=lambda x: (x["quant"], x["build"], x["threads"])):
         ram = r["peak_ram_gb"] if r["peak_ram_gb"] is not None else "-"
+        ttft = r["ttft_ms"] if r.get("ttft_ms") is not None else "-"
         ppl_c = ""
         if has_ppl:
             ppl_c = f" {r['ppl'] if r.get('ppl') is not None else '-'} |"
         lines.append(
             f"| {r['quant']} | {r['build']} | {r['threads']} | {r['size_gb']} | "
-            f"{r['prefill_tps']} | {r['decode_tps']} | {r['ttft_ms']} | {ram} |{ppl_c}"
+            f"{r['prefill_tps']} | {r['decode_tps']} | {ttft} | {ram} |{ppl_c}"
         )
     lines += ["", f"_TTFT is derived from prefill throughput at "
-                  f"{results[0]['n_prompt'] if results else 512}-token prompts._", ""]
+                  f"{results[0]['n_prompt'] if results else 512}-token prompts. "
+                  f"Peak RAM is whole-process peak RSS (model load + all reps)._", ""]
     builds, groups = _thread_scaling(results, "Q4_0")
     if groups:
         lines += [
@@ -184,15 +200,18 @@ def _markdown(model, results, host, meta, speedups) -> str:
 
 
 def _html(model, results, host, meta, speedups) -> str:
+    # One bar per quant: KleidiAI-on rows at the max thread count only —
+    # plotting every thread count repeats identical quant labels.
     decode_rows = [r for r in results if r["build"] == "kleidiai-on"] or results
+    max_t = max((r["threads"] for r in decode_rows), default=0)
+    decode_rows = [r for r in decode_rows if r["threads"] == max_t]
     chart = _svg_bars(
         [(f"{r['quant']}", r["decode_tps"]) for r in
          sorted(decode_rows, key=lambda x: x["decode_tps"])],
-        title="Decode tok/s (KleidiAI on)")
+        title=f"Decode tok/s (KleidiAI on, {max_t} threads)")
     _, scaling_groups = _thread_scaling(results, "Q4_0")
     scaling_chart = _svg_grouped_bars(
         scaling_groups, title="Thread scaling — decode tok/s (Q4_0)")
-    speed_html = ""
     speed_html = ""
     for quant, speedup in speedups.items():
         naive_html = ""
@@ -219,7 +238,7 @@ def _html(model, results, host, meta, speedups) -> str:
         f"<td>{r['build']}</td>"
         f"<td>{r['threads']}</td><td>{r['size_gb']}</td>"
         f"<td>{r['prefill_tps']}</td><td>{r['decode_tps']}</td>"
-        f"<td>{r['ttft_ms']}</td>"
+        f"<td>{r['ttft_ms'] if r.get('ttft_ms') is not None else '-'}</td>"
         f"<td>{r['peak_ram_gb'] if r['peak_ram_gb'] is not None else '-'}</td>"
         + (f"<td>{r['ppl'] if r.get('ppl') is not None else '-'}</td>" if has_ppl else "")
         + "</tr>"

@@ -48,6 +48,9 @@ def run(cmd, cwd: Optional[Path] = None, env: Optional[dict] = None,
     """Run a command, streaming or capturing output.
 
     Pass a list (preferred) or a string. Raises on non-zero exit when check=True.
+    When capturing, stdout and stderr are kept SEPARATE (proc.stdout /
+    proc.stderr) — llama-bench emits machine-readable JSON on stdout and logs
+    on stderr, and merging them can corrupt the JSON mid-array.
     """
     shell = isinstance(cmd, str)
     printable = cmd if shell else " ".join(str(c) for c in cmd)
@@ -57,7 +60,7 @@ def run(cmd, cwd: Optional[Path] = None, env: Optional[dict] = None,
         cmd, cwd=str(cwd) if cwd else None, env=full_env, shell=shell,
         text=True, check=check,
         stdout=subprocess.PIPE if capture else None,
-        stderr=subprocess.STDOUT if capture else None,
+        stderr=subprocess.PIPE if capture else None,
     )
 
 
