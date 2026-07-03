@@ -101,6 +101,20 @@ gh repo create <you>/kleidibench --public --source=. --push
 
 Or on any Arm64 Linux box: `pip install -e . && kleidibench run <hf-model>`.
 
+## What's next
+
+- **More Arm targets, same harness**: the tool already decodes Neoverse
+  N1/N2/V1/V2 — running the identical sweep on Graviton4 (`i8mm`+SVE at scale)
+  and Axion would turn the leaderboard into a cross-cloud Arm buying guide.
+- **SME2 tracking**: as SME2-capable Arm cores reach servers, the 3-way build
+  comparison is exactly the instrument to measure what KleidiAI's SME2 kernels
+  add — zero harness changes needed.
+- **Regression watchdog**: the CI smoke test already re-benchmarks on every
+  push; pointing it at nightly llama.cpp master would catch Arm performance
+  regressions upstream before releases ship.
+- **Arm Performix integration** is already stubbed (`--perfix`) for deep
+  memory-bandwidth/cache profiling where the toolkit is installed.
+
 ## Built with
 
 llama.cpp · KleidiAI (`GGML_CPU_KLEIDIAI`) · GitHub Actions arm64 runners
