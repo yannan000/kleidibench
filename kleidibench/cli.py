@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import List, Optional
 
 from . import util, build as build_mod, quantize as quant_mod, bench as bench_mod
-from . import report as report_mod, perfix as perfix_mod
+from . import report as report_mod, perfix as perfix_mod, leaderboard as lb_mod
 
 
 def _thread_counts(host, override: Optional[List[int]]) -> List[int]:
@@ -91,7 +91,13 @@ def cmd_sweep(args) -> int:
         sub.quants = cfg.get("quants") and ",".join(cfg["quants"]) or args.quants
         sub.threads = cfg.get("threads") and ",".join(map(str, cfg["threads"])) or args.threads
         rc |= cmd_run(sub)
+    lb_mod.build_leaderboard(price_per_hour=cfg.get("price_per_hour", 0.0))
     return rc
+
+
+def cmd_leaderboard(args) -> int:
+    out = lb_mod.build_leaderboard(price_per_hour=args.price_per_hour)
+    return 0 if out else 2
 
 
 def cmd_info(args) -> int:
@@ -130,6 +136,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     i = sub.add_parser("info", help="print detected Arm host info")
     i.set_defaults(func=cmd_info)
+
+    l = sub.add_parser("leaderboard",
+                       help="rebuild results/leaderboard.{md,html} from existing results")
+    l.add_argument("--price-per-hour", type=float, default=0.0, dest="price_per_hour",
+                   help="instance $/hr for the $/Mtok column (default 0 = free host)")
+    l.set_defaults(func=cmd_leaderboard)
     return p
 
 

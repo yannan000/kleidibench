@@ -11,6 +11,8 @@ can show the size-vs-speed-vs-quality tradeoff curve.
 """
 from __future__ import annotations
 
+import importlib.util
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional
@@ -54,6 +56,22 @@ def _download_hf(hf_repo: str) -> Path:
     return Path(local)
 
 
+def _ensure_convert_deps() -> None:
+    """convert_hf_to_gguf.py needs torch/transformers/gguf etc. Install
+    llama.cpp's own pinned requirements file on first use so the harness works
+    on a bare host (CI runner, fresh VM) without a manual pip step."""
+    if importlib.util.find_spec("torch") and importlib.util.find_spec("gguf"):
+        return
+    req = util.LLAMA_SRC / "requirements" / "requirements-convert_hf_to_gguf.txt"
+    if req.exists():
+        util.log("installing llama.cpp converter requirements (torch etc.) ...")
+        util.run([sys.executable, "-m", "pip", "install", "-q", "-r", str(req)])
+    else:  # older checkouts shipped a single top-level requirements.txt
+        util.run([sys.executable, "-m", "pip", "install", "-q",
+                  "torch", "numpy", "sentencepiece", "transformers",
+                  "gguf", "protobuf"])
+
+
 def convert_to_f16(hf_repo: str, local_dir: Optional[Path] = None) -> ModelArtifact:
     """Produce the F16 GGUF baseline from an HF checkpoint."""
     util.ensure_dirs()
@@ -67,7 +85,8 @@ def convert_to_f16(hf_repo: str, local_dir: Optional[Path] = None) -> ModelArtif
         )
     out = util.MODELS / f"{name}-F16.gguf"
     if not out.exists():
-        util.run(["python3", str(convert), str(src), "--outfile", str(out),
+        _ensure_convert_deps()
+        util.run([sys.executable, str(convert), str(src), "--outfile", str(out),
                   "--outtype", "f16"])
     return _artifact(name, "F16", out)
 
