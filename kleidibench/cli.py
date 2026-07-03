@@ -108,6 +108,7 @@ def cmd_sweep(args) -> int:
         sub.local_dir = None if isinstance(m, str) else m.get("local_dir")
         sub.quants = cfg.get("quants") and ",".join(cfg["quants"]) or args.quants
         sub.threads = cfg.get("threads") and ",".join(map(str, cfg["threads"])) or args.threads
+        sub.quality = cfg.get("quality", args.quality)
         rc |= cmd_run(sub)
     lb_mod.build_leaderboard(price_per_hour=cfg.get("price_per_hour", 0.0))
     return rc

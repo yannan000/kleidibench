@@ -55,7 +55,9 @@ def build_leaderboard(price_per_hour: float = 0.0,
         best = best_row(run["results"])
         if not best:
             continue
-        speed = kleidiai_speedup(run["results"], "Q4_0")
+        # Gain at the best row's own quant — e.g. when Q8_0+KleidiAI wins the
+        # ranking, show the Q8_0 gain (the real i8mm win), not Q4_0's ~1.0x.
+        speed = kleidiai_speedup(run["results"], best["quant"])
         rows.append({
             "model": run["model"],
             "quant": best["quant"],

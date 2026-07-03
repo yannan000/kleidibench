@@ -1,5 +1,7 @@
 # KleidiBench
 
+[![benchmark](https://github.com/yannan000/kleidibench/actions/workflows/benchmark.yml/badge.svg)](https://github.com/yannan000/kleidibench/actions/workflows/benchmark.yml)
+
 **One command to prove how much faster your LLM runs on Arm with KleidiAI.**
 
 KleidiBench quantizes any Hugging Face LLM, builds `llama.cpp` **with and without** Arm's
