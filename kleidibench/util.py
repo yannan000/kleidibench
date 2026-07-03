@@ -22,6 +22,7 @@ HOME = Path(os.environ.get("KLEIDIBENCH_HOME", Path.home() / ".kleidibench")).ex
 LLAMA_SRC = HOME / "llama.cpp"          # upstream checkout
 BUILD_ON = HOME / "build-kleidiai-on"   # cmake build dir, GGML_CPU_KLEIDIAI=ON
 BUILD_OFF = HOME / "build-kleidiai-off"  # cmake build dir, GGML_CPU_KLEIDIAI=OFF
+BUILD_NAIVE = HOME / "build-repack-off"  # repack AND KleidiAI off: naive baseline
 MODELS = HOME / "models"                 # gguf files
 
 # results/ is committed to the repo, so it lives next to the package, not in HOME.
@@ -110,8 +111,9 @@ def detect_host() -> HostInfo:
                 break
             if line.lower().startswith("model name") and ":" in line:
                 cpu_model = line.split(":", 1)[1].strip()
-        # Ampere Altra often reports "CPU implementer/part" rather than model name.
-        if cpu_model in ("", "unknown"):
+        # Many Arm servers report "CPU implementer/part" rather than model name
+        # (platform.processor() often just echoes the arch string).
+        if cpu_model in ("", "unknown", arch):
             impl = _grep_cpuinfo(text, "cpu implementer")
             part = _grep_cpuinfo(text, "cpu part")
             if impl or part:

@@ -1,13 +1,20 @@
-"""Clone and build llama.cpp twice: KleidiAI ON and KleidiAI OFF.
+"""Clone and build llama.cpp in three variants for a fair 3-way comparison.
 
-The only difference between the two builds is the CMake flag
-`-DGGML_CPU_KLEIDIAI=ON|OFF`. That is the whole point of KleidiBench: KleidiAI
-accelerates Arm CPU inference with *no code changes* — you just flip a build
-flag — and we measure exactly what that flag buys you.
+    naive  (repack-off)   -DGGML_CPU_KLEIDIAI=OFF -DGGML_CPU_REPACK=OFF
+    off    (kleidiai-off) -DGGML_CPU_KLEIDIAI=OFF   (llama.cpp default: its own
+                          aarch64 runtime-repack kernels stay enabled)
+    on     (kleidiai-on)  -DGGML_CPU_KLEIDIAI=ON
 
-KleidiAI's optimized kernels kick in for `Q4_0` weights (repacked at load time)
-using dotprod on Neoverse N1 and i8mm/SVE on V1/V2. So the ON-vs-OFF delta is
-most visible on the Q4_0 model.
+Why three: modern llama.cpp already ships optimized aarch64 repack kernels in
+its default CPU backend, so "KleidiAI off" is NOT a naive baseline — comparing
+only on/off understates what Arm-optimized code paths deliver overall. The
+naive build (repack disabled too) shows the full journey: generic kernels ->
+llama.cpp's Arm repack -> Arm's KleidiAI micro-kernels.
+
+KleidiAI's kernels kick in for `Q4_0` weights (repacked at load time) using
+dotprod/i8mm/SME depending on the core, so the deltas are most visible on the
+Q4_0 model. (GGML_CPU_REPACK was formerly named GGML_CPU_AARCH64; we pass both
+so older checkouts honor it — unknown CMake vars only warn.)
 """
 from __future__ import annotations
 
@@ -19,19 +26,25 @@ from . import util
 
 LLAMA_REPO = "https://github.com/ggml-org/llama.cpp.git"
 
+# variant name -> (build dir, extra cmake flags, result label)
+VARIANTS = {
+    "naive": (util.BUILD_NAIVE,
+              ["-DGGML_CPU_KLEIDIAI=OFF", "-DGGML_CPU_REPACK=OFF",
+               "-DGGML_CPU_AARCH64=OFF"],
+              "repack-off"),
+    "off": (util.BUILD_OFF, ["-DGGML_CPU_KLEIDIAI=OFF"], "kleidiai-off"),
+    "on": (util.BUILD_ON, ["-DGGML_CPU_KLEIDIAI=ON"], "kleidiai-on"),
+}
+
 
 @dataclass
 class Build:
-    kleidiai: bool
+    label: str
     build_dir: Path
     llama_bench: Path
     llama_cli: Path
     llama_quantize: Path
     llama_perplexity: Path
-
-    @property
-    def label(self) -> str:
-        return "kleidiai-on" if self.kleidiai else "kleidiai-off"
 
 
 def clone_llama(ref: Optional[str] = None) -> Path:
@@ -56,9 +69,8 @@ def llama_commit() -> str:
         return "unknown"
 
 
-def _cmake_build(kleidiai: bool, jobs: Optional[int] = None) -> Build:
-    build_dir = util.BUILD_ON if kleidiai else util.BUILD_OFF
-    flag = "ON" if kleidiai else "OFF"
+def _cmake_build(variant: str, jobs: Optional[int] = None) -> Build:
+    build_dir, extra_flags, label = VARIANTS[variant]
     jobs = jobs or util.detect_host().cores
 
     # Configure. CPU-only (no CUDA/Metal) — this is a cloud CPU benchmark.
@@ -66,7 +78,7 @@ def _cmake_build(kleidiai: bool, jobs: Optional[int] = None) -> Build:
         "cmake", "-S", str(util.LLAMA_SRC), "-B", str(build_dir),
         "-DCMAKE_BUILD_TYPE=Release",
         "-DGGML_NATIVE=ON",              # let the compiler target the host Arm core
-        f"-DGGML_CPU_KLEIDIAI={flag}",
+        *extra_flags,
         "-DLLAMA_CURL=OFF",              # avoid libcurl dep on bare VMs
         "-DGGML_CUDA=OFF", "-DGGML_METAL=OFF",
     ])
@@ -78,7 +90,7 @@ def _cmake_build(kleidiai: bool, jobs: Optional[int] = None) -> Build:
 
     bindir = build_dir / "bin"
     b = Build(
-        kleidiai=kleidiai,
+        label=label,
         build_dir=build_dir,
         llama_bench=_find(bindir, "llama-bench"),
         llama_cli=_find(bindir, "llama-cli"),
@@ -100,10 +112,7 @@ def _find(bindir: Path, name: str) -> Path:
     raise FileNotFoundError(f"could not locate built binary '{name}' under {bindir.parent}")
 
 
-def build_both(ref: Optional[str] = None, jobs: Optional[int] = None) -> dict:
-    """Build both variants. Returns {'on': Build, 'off': Build}."""
+def build_all(ref: Optional[str] = None, jobs: Optional[int] = None) -> dict:
+    """Build all three variants. Returns {'naive'|'off'|'on': Build}."""
     clone_llama(ref)
-    return {
-        "off": _cmake_build(kleidiai=False, jobs=jobs),
-        "on": _cmake_build(kleidiai=True, jobs=jobs),
-    }
+    return {v: _cmake_build(v, jobs=jobs) for v in ("naive", "off", "on")}

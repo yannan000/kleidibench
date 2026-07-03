@@ -40,7 +40,7 @@ def cmd_run(args) -> int:
     util.log(f"host: {host.cpu_model} | {host.cores} cores | "
              f"features={host.features} | threads={threads} | quants={quants}")
 
-    builds = build_mod.build_both(ref=args.llama_ref, jobs=args.jobs)
+    builds = build_mod.build_all(ref=args.llama_ref, jobs=args.jobs)
     arts = quant_mod.prepare_models(
         args.model, quants=quants,
         local_dir=Path(args.local_dir) if args.local_dir else None,
@@ -49,9 +49,9 @@ def cmd_run(args) -> int:
 
     results: List[dict] = []
     for art in arts:
-        # F16 baseline only needs to run once (KleidiAI doesn't touch it); the
-        # ON/OFF comparison that matters is on the quantized (esp. Q4_0) weights.
-        build_variants = ["off"] if art.quant == "F16" else ["off", "on"]
+        # F16 only runs once (neither repack nor KleidiAI touch it); quantized
+        # weights get the full 3-way comparison: naive -> repack -> KleidiAI.
+        build_variants = ["off"] if art.quant == "F16" else ["naive", "off", "on"]
         for bv in build_variants:
             for t in threads:
                 res = bench_mod.run_bench(builds[bv], art, threads=t,

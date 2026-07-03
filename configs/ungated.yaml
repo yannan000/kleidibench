@@ -1,0 +1,19 @@
+# Full sweep using only UNGATED models — runs without any HF_TOKEN secret.
+# Use this for the first real full-benchmark dispatch; add Llama models via
+# configs/leaderboard.yaml once HF_TOKEN is configured.
+#   kleidibench sweep configs/ungated.yaml
+
+models:
+  - Qwen/Qwen2.5-0.5B-Instruct
+  - Qwen/Qwen2.5-1.5B-Instruct
+  - Qwen/Qwen2.5-3B-Instruct
+
+quants:
+  - Q8_0
+  - Q4_K_M
+  - Q4_0
+
+threads:
+  - 1
+  - 2
+  - 4

@@ -20,12 +20,16 @@ from . import util
 # --------------------------------------------------------------------------- #
 
 def kleidiai_speedup(results: List[dict], quant: str = "Q4_0") -> dict:
-    """Compute ON/OFF speedup for a given quant at its best thread count."""
+    """Compute speedups for a given quant at its best thread count.
+
+    Two comparisons: KleidiAI-on vs llama.cpp's default Arm path (kleidiai-off),
+    and — when a repack-off naive run exists — Arm-optimized-total vs naive,
+    which shows the full journey from generic kernels to KleidiAI."""
     on = _best(results, quant, "kleidiai-on")
     off = _best(results, quant, "kleidiai-off")
     if not on or not off:
         return {}
-    return {
+    out = {
         "quant": quant,
         "prefill_on": on["prefill_tps"], "prefill_off": off["prefill_tps"],
         "decode_on": on["decode_tps"], "decode_off": off["decode_tps"],
@@ -33,6 +37,15 @@ def kleidiai_speedup(results: List[dict], quant: str = "Q4_0") -> dict:
         "decode_speedup": _ratio(on["decode_tps"], off["decode_tps"]),
         "threads": on["threads"],
     }
+    naive = _best(results, quant, "repack-off")
+    if naive:
+        out.update({
+            "prefill_naive": naive["prefill_tps"],
+            "decode_naive": naive["decode_tps"],
+            "prefill_vs_naive": _ratio(on["prefill_tps"], naive["prefill_tps"]),
+            "decode_vs_naive": _ratio(on["decode_tps"], naive["decode_tps"]),
+        })
+    return out
 
 
 def _best(results, quant, build):
@@ -75,28 +88,35 @@ def _markdown(model, results, host, meta, speedup) -> str:
     ]
     if speedup:
         lines += [
-            "## KleidiAI speedup (Q4_0)",
+            "## Arm optimization gains (Q4_0)",
             "",
-            f"- **Prefill:** {speedup['prefill_off']} -> {speedup['prefill_on']} tok/s "
-            f"(**{speedup['prefill_speedup']}x**)",
-            f"- **Decode:** {speedup['decode_off']} -> {speedup['decode_on']} tok/s "
+            f"- **KleidiAI vs llama.cpp default Arm path** — prefill "
+            f"{speedup['prefill_off']} -> {speedup['prefill_on']} tok/s "
+            f"(**{speedup['prefill_speedup']}x**), decode "
+            f"{speedup['decode_off']} -> {speedup['decode_on']} tok/s "
             f"(**{speedup['decode_speedup']}x**)",
-            f"- Best at {speedup['threads']} threads.",
-            "",
         ]
+        if "decode_vs_naive" in speedup:
+            lines += [
+                f"- **KleidiAI vs naive (no Arm repack)** — prefill "
+                f"{speedup['prefill_naive']} -> {speedup['prefill_on']} tok/s "
+                f"(**{speedup['prefill_vs_naive']}x**), decode "
+                f"{speedup['decode_naive']} -> {speedup['decode_on']} tok/s "
+                f"(**{speedup['decode_vs_naive']}x**)",
+            ]
+        lines += [f"- Best at {speedup['threads']} threads.", ""]
     lines += [
         "## Full sweep",
         "",
-        "| Quant | KleidiAI | Threads | Size (GB) | Prefill tok/s | Decode tok/s | "
+        "| Quant | Build | Threads | Size (GB) | Prefill tok/s | Decode tok/s | "
         "TTFT (ms) | Peak RAM (GB) |",
-        "|-------|----------|--------:|----------:|--------------:|-------------:|"
+        "|-------|-------|--------:|----------:|--------------:|-------------:|"
         "----------:|--------------:|",
     ]
     for r in sorted(results, key=lambda x: (x["quant"], x["build"], x["threads"])):
-        ka = "on" if r["build"] == "kleidiai-on" else "off"
         ram = r["peak_ram_gb"] if r["peak_ram_gb"] is not None else "-"
         lines.append(
-            f"| {r['quant']} | {ka} | {r['threads']} | {r['size_gb']} | "
+            f"| {r['quant']} | {r['build']} | {r['threads']} | {r['size_gb']} | "
             f"{r['prefill_tps']} | {r['decode_tps']} | {r['ttft_ms']} | {ram} |"
         )
     lines += ["", f"_TTFT is derived from prefill throughput at "
@@ -112,18 +132,26 @@ def _html(model, results, host, meta, speedup) -> str:
         title="Decode tok/s (KleidiAI on)")
     speed_html = ""
     if speedup:
+        naive_html = ""
+        if "decode_vs_naive" in speedup:
+            naive_html = (
+                f"<p><b>vs naive (no Arm repack)</b>: prefill "
+                f"<span class='up'>{speedup['prefill_vs_naive']}&times;</span>, "
+                f"decode <span class='up'>{speedup['decode_vs_naive']}&times;</span></p>"
+            )
         speed_html = (
-            f"<div class='callout'><h2>KleidiAI speedup (Q4_0)</h2>"
+            f"<div class='callout'><h2>Arm optimization gains (Q4_0)</h2>"
             f"<p><b>Prefill</b>: {speedup['prefill_off']} &rarr; "
             f"{speedup['prefill_on']} tok/s "
             f"(<span class='up'>{speedup['prefill_speedup']}&times;</span>)</p>"
             f"<p><b>Decode</b>: {speedup['decode_off']} &rarr; "
             f"{speedup['decode_on']} tok/s "
-            f"(<span class='up'>{speedup['decode_speedup']}&times;</span>)</p></div>"
+            f"(<span class='up'>{speedup['decode_speedup']}&times;</span>)</p>"
+            f"{naive_html}</div>"
         )
     trows = "".join(
         f"<tr><td>{r['quant']}</td>"
-        f"<td>{'on' if r['build']=='kleidiai-on' else 'off'}</td>"
+        f"<td>{r['build']}</td>"
         f"<td>{r['threads']}</td><td>{r['size_gb']}</td>"
         f"<td>{r['prefill_tps']}</td><td>{r['decode_tps']}</td>"
         f"<td>{r['ttft_ms']}</td>"
@@ -150,7 +178,7 @@ border-radius:6px;margin:1rem 0}}
 {meta.get('timestamp')}</p>
 {speed_html}
 {chart}
-<table><thead><tr><th>Quant</th><th>KleidiAI</th><th>Threads</th><th>Size GB</th>
+<table><thead><tr><th>Quant</th><th>Build</th><th>Threads</th><th>Size GB</th>
 <th>Prefill t/s</th><th>Decode t/s</th><th>TTFT ms</th><th>Peak RAM GB</th></tr></thead>
 <tbody>{trows}</tbody></table>
 <p class="sub">Generated by KleidiBench. Reproduce with

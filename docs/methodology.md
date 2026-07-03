@@ -2,23 +2,31 @@
 
 How KleidiBench produces its numbers, so results are reproducible and defensible.
 
-## What "KleidiAI on/off" means
+## The 3-way build comparison
 
-The **only** difference between the two builds is one CMake flag:
+Three builds of the same llama.cpp commit, differing only in CMake flags:
 
-```
--DGGML_CPU_KLEIDIAI=ON    vs    -DGGML_CPU_KLEIDIAI=OFF
-```
+| Variant | Flags | What it represents |
+|---------|-------|--------------------|
+| `repack-off` (naive) | `-DGGML_CPU_KLEIDIAI=OFF -DGGML_CPU_REPACK=OFF` | generic CPU kernels, no Arm-specific weight repacking |
+| `kleidiai-off` | `-DGGML_CPU_KLEIDIAI=OFF` | llama.cpp's **default**: its own aarch64 runtime-repack kernels |
+| `kleidiai-on` | `-DGGML_CPU_KLEIDIAI=ON` | Arm's KleidiAI micro-kernels |
 
-Both are `Release` + `GGML_NATIVE=ON` (compiler targets the host Arm core),
-CPU-only (no CUDA/Metal), same commit, same machine, same model file. So any
-delta is attributable to KleidiAI's optimized micro-kernels — no code changes,
-which is exactly KleidiAI's design goal.
+All are `Release` + `GGML_NATIVE=ON` (compiler targets the host Arm core),
+CPU-only, same commit, same machine, same model file.
+
+Why three and not two: modern llama.cpp already ships optimized aarch64 repack
+kernels *in its default build*, so "KleidiAI off" is **not** a naive baseline —
+an on/off-only comparison understates what Arm-optimized code paths deliver.
+The naive build shows the full journey (generic → llama.cpp Arm repack →
+KleidiAI) and keeps the headline honest: we report both "KleidiAI vs default"
+and "KleidiAI vs naive".
 
 KleidiAI accelerates **`Q4_0`** weights: at model load, llama.cpp repacks them
-into a KleidiAI-friendly layout and dispatches to kernels using `dotprod` on
-Neoverse N1 (and `i8mm`/SVE on V1/V2). That is why the ON/OFF comparison is run
-on the quantized models and the headline number is Q4_0.
+into a KleidiAI-friendly layout and dispatches to kernels using
+`dotprod`/`i8mm`/SVE/SME depending on the host core. That is why the comparison
+runs on quantized models and the headline number is Q4_0. (F16 is benched once,
+on the default build — neither repack path touches it.)
 
 ## Metrics
 
