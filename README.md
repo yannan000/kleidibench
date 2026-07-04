@@ -5,14 +5,24 @@
 **"Should we run this LLM on Arm — and how?" Answered in one free CI run:
 a serving decision (quant, build, RAM, quality cost, $/Mtok), not just a number.**
 
-KleidiBench takes any Hugging Face LLM, builds `llama.cpp` **three ways** — naive,
-default Arm path, and Arm's [KleidiAI](https://gitlab.arm.com/kleidi/kleidiai)
-micro-kernels — benchmarks every (quant × build × threads) combination on an Arm64
-CPU, and emits reproducible **dashboard-style reports**: size, prefill/decode
-tok/s, TTFT, peak RAM, perplexity, and cost-per-million-tokens.
+Arm cloud is 30–40% cheaper per vCPU — but teams don't capture that saving,
+because *"will our model perform?"* costs an engineer-week to answer properly:
+build variants, quantize, control the variables, chase OOMs, interpret.
 
-Everything below ran on **free GitHub Actions arm64 runners** (`ubuntu-24.04-arm`,
-real Neoverse N2 silicon, free for public repos). No GPU. No cloud account. $0.
+**KleidiBench collapses that week into one $0 CI run.** Fork → push → a free
+GitHub arm64 runner hands you the verdict for *your* model:
+
+| You ask | It answers — measured, not estimated |
+|---------|--------------------------------------|
+| Which quant? | **Q8_0+KleidiAI up to ~3B** (fastest *and* +1.3% quality); **Q4_0 past the decode crossover** for chat workloads |
+| Which build flag? | KleidiAI is **1.73× prefill at Q8_0** — and ~1.0× at Q4_0; the report shows where the flag pays *for your model* |
+| How much RAM? | **~2× the GGUF file size** for the fast path (measured, incl. why) |
+| What does it cost? | **$/million-tokens** per config — the row a migration proposal needs |
+| Can I trust it? | 3-way methodology, run-to-run noise **measured at 0.54% median**, re-run by anyone with a GitHub account |
+
+Proof below: **9 models, 6 lineages, 0.5B→12B** — including architectures
+benchmarked *days after release*, before converter support existed. Every
+number from real Neoverse N2 silicon. No GPU. No cloud account. **$0.**
 
 > Submission for the **Arm Create: AI Optimization Challenge 2026**, Track 2 (Cloud AI).
 

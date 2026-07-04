@@ -22,40 +22,37 @@ Cloud AI (Track 2)
 
 ## Project overview
 
-Arm's KleidiAI micro-kernels promise faster LLM inference on Arm CPUs with *no
-code changes* — just flip llama.cpp's `GGML_CPU_KLEIDIAI` CMake flag. But how
-much faster, for *your* model, on *your* instance? Most developers never find
-out, because setting up a fair A/B/C benchmark (three builds, identical
-everything, multiple quant formats, multiple thread counts, parsed and
-charted) is an afternoon of yak-shaving.
+**The real blocker to Arm adoption isn't speed — it's uncertainty.** Arm cloud
+is marketed as 30–40% cheaper per vCPU, but teams don't capture that saving
+because *"will OUR model perform?"* costs an engineer-week to answer properly:
+build variants, quantize, control the variables, chase OOMs, interpret.
 
-KleidiBench makes it one command. `kleidibench run <any-hf-model>`:
-
-1. builds llama.cpp three ways — naive (no Arm repack), llama.cpp's default
-   Arm path, and KleidiAI — same commit, same flags otherwise
-2. converts the model to GGUF and quantizes it (F16 → Q8_0 → Q4_K_M → Q4_0)
-3. runs `llama-bench` across every (build × quant × thread-count) combination
-4. emits `report.md` + a standalone `report.html` leaderboard with charts —
-   size, prefill tok/s, decode tok/s, TTFT, peak RAM, and $/million-tokens
-
-And the twist that makes it radically accessible: **the Arm hardware is free
-GitHub Actions arm64 runners.** No cloud account, no provisioning, no quota.
-Fork the repo, push, and CI hands you your own Arm benchmark report. The
-benchmark is not just reproducible in principle — it re-runs automatically on
+**KleidiBench collapses that week into one $0 CI run whose output is a serving
+decision** — which quant, which build flag, how much RAM, what quality cost,
+what $/million-tokens — not a wall of numbers. Fork the repo, push, and a free
+GitHub Actions arm64 runner (real Neoverse N2, no cloud account, no quota)
+hands you the verdict for *your* model. The benchmark re-runs automatically on
 every commit.
 
-**Why it should win:** the real blocker to Arm adoption isn't speed — it's
-*uncertainty*. Arm cloud is marketed as 30–40% cheaper per vCPU, but teams
-don't capture that saving because "will OUR model perform?" costs an
-engineer-week to answer properly. KleidiBench collapses that week into one
-$0 CI run whose output is a **serving decision** (which quant, which build,
-what RAM, what quality cost, what $/Mtok), not a wall of numbers. And it
-keeps paying: day-one coverage of brand-new architectures (we benchmarked
-Gemma 4 before HF→GGUF converter support existed), an Arm
+How it earns the verdict: `kleidibench run <any-hf-model>`
+
+1. builds llama.cpp three ways — naive (no Arm repack), llama.cpp's default
+   Arm path, and KleidiAI (`GGML_CPU_KLEIDIAI`) — same commit, same flags otherwise
+2. converts the model to GGUF and quantizes it (F16 → Q8_0 → Q4_K_M → Q4_0),
+   or fetches pre-quantized GGUFs for day-one/oversize architectures
+3. runs `llama-bench` across every (build × quant × thread-count) combination,
+   plus perplexity per quant
+4. emits dashboard-style `report.html` per model + a combined leaderboard —
+   size, prefill/decode tok/s, TTFT, peak RAM, quality, $/million-tokens
+
+**Why it should win:** it answers the question that decides migrations, and it
+keeps paying after the decision — day-one coverage of brand-new architectures
+(we benchmarked Gemma 4 before HF→GGUF converter support existed), an Arm
 performance-regression watchdog when pointed at llama.cpp nightlies, and a
-3-way methodology that structurally prevents the misleading on/off
-benchmarks common in this space. A benchmark result, a de-risking
-instrument, and permanent ecosystem infrastructure — in one repo.
+3-way methodology that structurally prevents the misleading on/off benchmarks
+common in this space (it's what surfaced the Q8_0 finding below). A benchmark
+result, a de-risking instrument, and permanent ecosystem infrastructure — in
+one repo.
 
 ## Measured results
 
