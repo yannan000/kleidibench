@@ -1,0 +1,114 @@
+{
+  "model": "Qwythos-9B",
+  "host": {
+    "arch": "aarch64",
+    "is_arm": true,
+    "cpu_model": "Arm Neoverse N2",
+    "cores": 4,
+    "total_ram_gb": 15.6,
+    "features": [
+      "asimddp",
+      "i8mm",
+      "sve",
+      "sve2",
+      "bf16"
+    ],
+    "has_dotprod": true,
+    "has_i8mm": true,
+    "has_sve": true
+  },
+  "meta": {
+    "llama_commit": "2d973636e",
+    "timestamp": "2026-07-04T15:24:08",
+    "n_prompt": 512,
+    "n_gen": 128,
+    "reps": 3,
+    "prequantized": true
+  },
+  "results": [
+    {
+      "model": "Qwythos-9B",
+      "quant": "Q4_K_M",
+      "build": "repack-off",
+      "threads": 2,
+      "n_prompt": 512,
+      "n_gen": 128,
+      "prefill_tps": 6.16,
+      "decode_tps": 3.01,
+      "ttft_ms": 83051.0,
+      "peak_ram_gb": 5.5,
+      "size_gb": 5.243,
+      "ppl": 8.6281
+    },
+    {
+      "model": "Qwythos-9B",
+      "quant": "Q4_K_M",
+      "build": "repack-off",
+      "threads": 4,
+      "n_prompt": 512,
+      "n_gen": 128,
+      "prefill_tps": 12.24,
+      "decode_tps": 5.91,
+      "ttft_ms": 41816.9,
+      "peak_ram_gb": 5.5,
+      "size_gb": 5.243,
+      "ppl": 8.6281
+    },
+    {
+      "model": "Qwythos-9B",
+      "quant": "Q4_K_M",
+      "build": "kleidiai-off",
+      "threads": 2,
+      "n_prompt": 512,
+      "n_gen": 128,
+      "prefill_tps": 10.97,
+      "decode_tps": 3.43,
+      "ttft_ms": 46691.7,
+      "peak_ram_gb": 10.039,
+      "size_gb": 5.243,
+      "ppl": 8.6281
+    },
+    {
+      "model": "Qwythos-9B",
+      "quant": "Q4_K_M",
+      "build": "kleidiai-off",
+      "threads": 4,
+      "n_prompt": 512,
+      "n_gen": 128,
+      "prefill_tps": 21.57,
+      "decode_tps": 6.48,
+      "ttft_ms": 23734.5,
+      "peak_ram_gb": 10.039,
+      "size_gb": 5.243,
+      "ppl": 8.6281
+    },
+    {
+      "model": "Qwythos-9B",
+      "quant": "Q4_K_M",
+      "build": "kleidiai-on",
+      "threads": 2,
+      "n_prompt": 512,
+      "n_gen": 128,
+      "prefill_tps": 10.98,
+      "decode_tps": 3.43,
+      "ttft_ms": 46633.2,
+      "peak_ram_gb": 10.039,
+      "size_gb": 5.243,
+      "ppl": 8.6281
+    },
+    {
+      "model": "Qwythos-9B",
+      "quant": "Q4_K_M",
+      "build": "kleidiai-on",
+      "threads": 4,
+      "n_prompt": 512,
+      "n_gen": 128,
+      "prefill_tps": 21.63,
+      "decode_tps": 6.49,
+      "ttft_ms": 23672.0,
+      "peak_ram_gb": 10.039,
+      "size_gb": 5.243,
+      "ppl": 8.6281
+    }
+  ]
+}
