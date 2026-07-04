@@ -1,0 +1,19 @@
+# Gemma 4 E4B alone (the crossfamily leg that was cancelled mid-run).
+# Pre-quantized GGUFs: the HF->GGUF converter can't parse Gemma 4's tokenizer
+# config yet. Full 3-way build comparison + perplexity on each quant.
+#   Dispatch: Actions -> benchmark -> Run workflow -> config: configs/gemma4-e4b.yaml
+
+models:
+  - repo: unsloth/gemma-4-E4B-it-GGUF
+    name: gemma-4-E4B-it
+    gguf:
+      Q8_0: gemma-4-E4B-it-Q8_0.gguf
+      Q4_K_M: gemma-4-E4B-it-Q4_K_M.gguf
+      Q4_0: gemma-4-E4B-it-Q4_0.gguf
+
+threads:
+  - 1
+  - 2
+  - 4
+
+quality: true
