@@ -1,262 +1,228 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>KleidiBench demo — LLM on a free Arm64 CPU</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KleidiBench — LLM on a free Arm64 CPU</title>
+<!--
+  KleidiBench demo chat UI (v2).
+  Design language: "KleidiBench Visual System" (generated with Google Stitch,
+  ported by hand to stay fully self-contained — no CDNs, fonts, or external
+  requests; the only network call is the user-configured API base URL).
+  Protocol/metrics logic is v1's, verified against a real llama-server.
+-->
 <style>
-  /* KleidiBench demo chat — self-contained, no external resources. */
+:root {
+  --bg: #0a0c10;
+  --surface: #111318;
+  --surface-c: #1e2024;
+  --surface-ch: #282a2e;
+  --outline: #3f484b;
+  --text: #e2e2e8;
+  --text-dim: #bec8cc;
+  --muted: #889296;
+  --primary: #82d2e7;
+  --primary-c: #0b7285;
+  --error: #ffb4ab;
+  --user-bubble: #2d333b;
+  --font-sans: "Geist", -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: light) {
   :root {
-    --accent: #0b7285;
-    --accent-soft: rgba(11, 114, 133, 0.12);
-    --bg: #f5f7f8;
-    --panel: #ffffff;
-    --text: #1c2528;
-    --muted: #6b7a80;
-    --border: #dde4e7;
-    --user-bubble: #0b7285;
-    --user-text: #ffffff;
-    --asst-bubble: #ffffff;
-    --shadow: 0 1px 3px rgba(16, 42, 51, 0.10);
+    --bg: #f4f6f8;
+    --surface: #ffffff;
+    --surface-c: #eef1f4;
+    --surface-ch: #e3e8ec;
+    --outline: #c6d0d6;
+    --text: #12203a;
+    --text-dim: #3f4d63;
+    --muted: #5b6b86;
+    --primary: #0b7285;
+    --primary-c: #0b7285;
+    --error: #b3261e;
+    --user-bubble: #dde4ea;
   }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --accent: #3aa8bd;
-      --accent-soft: rgba(58, 168, 189, 0.16);
-      --bg: #12181b;
-      --panel: #1b2327;
-      --text: #e4ebee;
-      --muted: #8fa1a8;
-      --border: #2b363b;
-      --user-bubble: #0b7285;
-      --user-text: #f2fbfd;
-      --asst-bubble: #1f292e;
-      --shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
-    }
-  }
-  * { box-sizing: border-box; }
-  html, body { height: 100%; }
-  body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-                 Helvetica, Arial, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    display: flex;
-    flex-direction: column;
-  }
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  display: flex; flex-direction: column;
+  background: var(--bg); color: var(--text);
+  font: 400 16px/1.6 var(--font-sans);
+  font-variant-numeric: tabular-nums;
+}
 
-  header {
-    background: var(--panel);
-    border-bottom: 1px solid var(--border);
-    padding: 14px 20px 12px;
-    box-shadow: var(--shadow);
-    flex: none;
-    z-index: 2;
-  }
-  .header-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-  h1 {
-    font-size: 17px;
-    font-weight: 650;
-    margin: 0;
-    letter-spacing: -0.01em;
-  }
-  h1 .dot { color: var(--accent); }
-  #perf-badge {
-    font-size: 13px;
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
-    color: var(--accent);
-    background: var(--accent-soft);
-    border: 1px solid var(--accent);
-    border-radius: 999px;
-    padding: 4px 12px;
-    white-space: nowrap;
-  }
-  #perf-badge.idle { opacity: 0.55; border-color: var(--border); color: var(--muted); background: transparent; }
-  .settings {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-    flex-wrap: wrap;
-  }
-  .settings label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: var(--muted);
-  }
-  .settings input {
-    font: inherit;
-    font-size: 13px;
-    color: var(--text);
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 5px 9px;
-    outline: none;
-  }
-  .settings input:focus { border-color: var(--accent); }
-  #base-url { width: 240px; }
-  #api-key { width: 110px; }
+/* ---------- header ---------- */
+header {
+  flex: 0 0 auto;
+  display: flex; align-items: center; gap: 16px;
+  height: 56px; padding: 0 24px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--outline);
+}
+.brand { display: flex; align-items: baseline; gap: 12px; min-width: 0; }
+.brand h1 {
+  margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.02em;
+  color: var(--primary); white-space: nowrap;
+}
+.brand .tag {
+  font: 400 12px/1.2 var(--font-mono); color: var(--muted); white-space: nowrap;
+}
+#perf-badge {
+  margin-left: auto; margin-right: auto;
+  font: 500 13px/1 var(--font-mono);
+  color: var(--primary);
+  background: var(--surface-c);
+  border: 1px solid var(--primary-c);
+  border-radius: 999px;
+  padding: 8px 14px; white-space: nowrap;
+  box-shadow: 0 0 12px 2px rgba(11, 114, 133, 0.2);
+}
+#perf-badge.idle { color: var(--muted); border-color: var(--outline); box-shadow: none; }
+.settings { display: flex; align-items: center; gap: 8px; }
+.settings label {
+  font: 600 11px/1 var(--font-mono); letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--muted);
+}
+.settings input {
+  font: 400 13px/1.2 var(--font-mono);
+  color: var(--text); background: var(--surface-c);
+  border: 1px solid var(--outline); border-radius: 6px;
+  padding: 6px 8px; outline: none;
+}
+.settings input:focus { border-color: var(--primary-c); }
+#base-url { width: 220px; }
+#api-key { width: 110px; }
+@media (max-width: 900px) {
+  .brand .tag, .settings label { display: none; }
+  #base-url { width: 150px; } #api-key { width: 80px; }
+}
 
-  main {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px 0 12px;
-  }
-  .chat-col {
-    max-width: 760px;
-    margin: 0 auto;
-    padding: 0 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-  .msg { display: flex; flex-direction: column; max-width: 82%; }
-  .msg.user { align-self: flex-end; align-items: flex-end; }
-  .msg.assistant { align-self: flex-start; align-items: flex-start; }
-  .bubble {
-    padding: 10px 14px;
-    border-radius: 16px;
-    font-size: 15px;
-    line-height: 1.5;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    box-shadow: var(--shadow);
-  }
-  .msg.user .bubble {
-    background: var(--user-bubble);
-    color: var(--user-text);
-    border-bottom-right-radius: 5px;
-  }
-  .msg.assistant .bubble {
-    background: var(--asst-bubble);
-    border: 1px solid var(--border);
-    border-bottom-left-radius: 5px;
-  }
-  .stats {
-    margin-top: 5px;
-    font-size: 12px;
-    font-variant-numeric: tabular-nums;
-    color: var(--accent);
-    font-weight: 600;
-  }
-  .msg.system {
-    align-self: center;
-    max-width: 90%;
-  }
-  .msg.system .bubble {
-    background: transparent;
-    border: 1px dashed var(--muted);
-    color: var(--muted);
-    font-size: 13px;
-    box-shadow: none;
-    text-align: center;
-  }
-  .cursor {
-    display: inline-block;
-    width: 8px; height: 15px;
-    margin-left: 2px;
-    background: var(--accent);
-    vertical-align: text-bottom;
-    animation: blink 1s steps(2) infinite;
-    border-radius: 2px;
-  }
-  @keyframes blink { 50% { opacity: 0; } }
-  .empty-hint {
-    text-align: center;
-    color: var(--muted);
-    font-size: 14px;
-    margin-top: 60px;
-    line-height: 1.7;
-  }
-  .empty-hint strong { color: var(--accent); }
+/* ---------- messages ---------- */
+#scroll-area { flex: 1 1 auto; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--user-bubble) transparent; }
+#scroll-area::-webkit-scrollbar { width: 8px; }
+#scroll-area::-webkit-scrollbar-thumb { background: var(--user-bubble); border-radius: 4px; }
+#messages { max-width: 860px; margin: 0 auto; padding: 24px 24px 8px; }
+.msg { display: flex; flex-direction: column; margin-bottom: 20px; }
+.msg.user { align-items: flex-end; }
+.msg.assistant, .msg.system { align-items: flex-start; }
+.bubble {
+  max-width: 76%; padding: 10px 14px; border-radius: 10px;
+  white-space: pre-wrap; overflow-wrap: break-word;
+}
+.msg.user .bubble { background: var(--user-bubble); color: var(--text); }
+.msg.assistant .bubble {
+  background: var(--surface-c);
+  border-left: 2px solid var(--primary-c);
+  border-radius: 4px 10px 10px 4px;
+  color: var(--text);
+}
+.msg.system .bubble {
+  background: transparent; color: var(--error);
+  border: 1px dashed var(--error); font-size: 14px;
+}
+.cursor {
+  display: inline-block; width: 8px; height: 16px;
+  background: var(--primary); vertical-align: text-bottom; margin-left: 2px;
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .cursor { animation: none; } }
 
-  footer {
-    flex: none;
-    background: var(--panel);
-    border-top: 1px solid var(--border);
-    padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
-  }
-  .input-row {
-    max-width: 760px;
-    margin: 0 auto;
-    display: flex;
-    gap: 10px;
-    align-items: flex-end;
-  }
-  #prompt {
-    flex: 1;
-    font: inherit;
-    font-size: 15px;
-    line-height: 1.4;
-    color: var(--text);
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 10px 14px;
-    resize: none;
-    outline: none;
-    max-height: 140px;
-  }
-  #prompt:focus { border-color: var(--accent); }
-  #send {
-    font: inherit;
-    font-size: 15px;
-    font-weight: 600;
-    color: #fff;
-    background: var(--accent);
-    border: none;
-    border-radius: 12px;
-    padding: 10px 22px;
-    cursor: pointer;
-    box-shadow: var(--shadow);
-  }
-  #send:hover:not(:disabled) { filter: brightness(1.08); }
-  #send:disabled { opacity: 0.5; cursor: default; }
+/* the hero: per-response stat chips */
+.stats { display: flex; gap: 8px; margin-top: 8px; }
+.chip {
+  font: 500 13px/1 var(--font-mono);
+  color: var(--text-dim); background: var(--surface-ch);
+  border: 1px solid var(--outline); border-radius: 6px;
+  padding: 6px 10px; white-space: nowrap;
+}
+.chip.tps {
+  color: var(--primary); border-color: var(--primary-c);
+  box-shadow: 0 0 10px 1px rgba(11, 114, 133, 0.25);
+}
+
+#empty-hint {
+  text-align: center; color: var(--muted);
+  font: 400 14px/1.6 var(--font-mono);
+  padding: 18vh 24px 0;
+}
+#empty-hint b { color: var(--primary); font-weight: 600; }
+
+/* ---------- input bar ---------- */
+.inputbar-wrap { flex: 0 0 auto; background: var(--surface); border-top: 1px solid var(--outline); }
+.inputbar {
+  max-width: 860px; margin: 0 auto;
+  display: flex; align-items: flex-end; gap: 10px; padding: 14px 24px 8px;
+}
+#prompt {
+  flex: 1 1 auto; resize: none;
+  font: 400 15px/1.5 var(--font-sans); color: var(--text);
+  background: var(--surface-c);
+  border: 1px solid var(--outline); border-radius: 10px;
+  padding: 11px 14px; outline: none; max-height: 140px;
+}
+#prompt:focus { border-color: var(--primary-c); }
+#prompt::placeholder { color: var(--muted); }
+button {
+  font: 600 14px/1 var(--font-sans); border-radius: 10px;
+  padding: 12px 18px; cursor: pointer; border: 1px solid transparent;
+}
+button:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+#send { background: var(--primary-c); color: #ffffff; }
+#send:hover:not(:disabled) { filter: brightness(1.15); }
+#send:disabled { opacity: 0.45; cursor: default; }
+#stop {
+  display: none;
+  background: transparent; color: var(--text-dim);
+  border-color: var(--outline);
+}
+#stop:hover { border-color: var(--error); color: var(--error); }
+body.busy #stop { display: inline-block; }
+.footnote {
+  max-width: 860px; margin: 0 auto; padding: 0 24px 12px;
+  font: 400 11px/1.4 var(--font-mono); color: var(--muted);
+}
+.footnote a { color: var(--muted); }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="header-top">
-    <h1>KleidiBench demo <span class="dot">·</span> LLM on a free Arm64 CPU</h1>
-    <div id="perf-badge" class="idle">TTFT — · — tok/s</div>
+  <div class="brand">
+    <h1>KleidiBench</h1>
+    <span class="tag">LLM on a free Arm64 CPU</span>
   </div>
+  <div id="perf-badge" class="idle">TTFT — · — tok/s</div>
   <div class="settings">
-    <label>Base URL
-      <input id="base-url" type="text" value="http://127.0.0.1:8080/v1" spellcheck="false">
-    </label>
-    <label>API key
-      <input id="api-key" type="text" value="demo-key" spellcheck="false">
-    </label>
+    <label for="base-url">API</label>
+    <input id="base-url" value="http://127.0.0.1:8080/v1" spellcheck="false">
+    <label for="api-key">Key</label>
+    <input id="api-key" type="password" value="demo-key" spellcheck="false">
   </div>
 </header>
 
-<main id="scroll-area">
-  <div class="chat-col" id="messages">
-    <div class="empty-hint" id="empty-hint">
-      Streaming chat against <strong>llama-server</strong> (llama.cpp, KleidiAI-accelerated)<br>
-      running on an Arm64 CPU. Type a message to start.
+<div id="scroll-area">
+  <div id="messages">
+    <div id="empty-hint">
+      Powered by <b>llama.cpp</b> + <b>KleidiAI</b> on Arm — ask anything.<br>
+      Tokens stream live; TTFT and tok/s are measured per response.
     </div>
   </div>
-</main>
+</div>
 
-<footer>
-  <div class="input-row">
-    <textarea id="prompt" rows="1"
-      placeholder="Ask something… (Enter to send, Shift+Enter for newline)"></textarea>
-    <button id="send">Send</button>
+<div class="inputbar-wrap">
+  <div class="inputbar">
+    <textarea id="prompt" rows="1" placeholder="Enter a prompt…  (Enter to send · Shift+Enter for a new line)"></textarea>
+    <button id="stop" type="button" title="Stop generating">Stop</button>
+    <button id="send" type="button">Send</button>
   </div>
-</footer>
+  <div class="footnote">
+    Served by llama.cpp + KleidiAI on Arm ·
+    <a href="https://github.com/yannan000/kleidibench">github.com/yannan000/kleidibench</a>
+  </div>
+</div>
 
 <script>
 "use strict";
@@ -268,12 +234,14 @@ const els = {
   scrollArea: document.getElementById("scroll-area"),
   prompt: document.getElementById("prompt"),
   send: document.getElementById("send"),
+  stop: document.getElementById("stop"),
   badge: document.getElementById("perf-badge"),
   emptyHint: document.getElementById("empty-hint"),
 };
 
 const conversation = [];   // {role, content} sent to the API
 let busy = false;
+let aborter = null;
 
 function scrollToBottom() {
   els.scrollArea.scrollTop = els.scrollArea.scrollHeight;
@@ -302,16 +270,31 @@ function setBadge(ttftMs, tps) {
     "TTFT " + Math.round(ttftMs) + " ms · " + tps.toFixed(1) + " tok/s";
 }
 
-function fmtStats(ttftMs, tps, nTokens) {
-  return "TTFT " + Math.round(ttftMs) + " ms · " +
-         tps.toFixed(1) + " tok/s · " + nTokens + " tokens";
+function addStats(wrap, ttftMs, tps, nTokens, partial) {
+  const stats = document.createElement("div");
+  stats.className = "stats";
+  const mk = (txt, cls) => {
+    const c = document.createElement("span");
+    c.className = "chip" + (cls ? " " + cls : "");
+    c.textContent = txt;
+    stats.appendChild(c);
+  };
+  mk("TTFT " + Math.round(ttftMs) + " ms");
+  mk(tps.toFixed(1) + " tok/s", "tps");
+  mk(nTokens + " tokens" + (partial ? " · stopped" : ""));
+  wrap.appendChild(stats);
+}
+
+function setBusy(v) {
+  busy = v;
+  els.send.disabled = v;
+  document.body.classList.toggle("busy", v);
 }
 
 async function send() {
   const text = els.prompt.value.trim();
   if (!text || busy) return;
-  busy = true;
-  els.send.disabled = true;
+  setBusy(true);
   els.prompt.value = "";
   autosize();
 
@@ -328,6 +311,7 @@ async function send() {
   let lastTokenAt = null;
   let nTokens = 0;
   let full = "";
+  let stopped = false;
 
   const baseUrl = els.baseUrl.value.trim().replace(/\/+$/, "");
   const headers = { "Content-Type": "application/json" };
@@ -344,10 +328,13 @@ async function send() {
     scrollToBottom();
   };
 
+  aborter = new AbortController();
+
   try {
     const resp = await fetch(baseUrl + "/chat/completions", {
       method: "POST",
       headers,
+      signal: aborter.signal,
       body: JSON.stringify({
         model: "local",
         stream: true,
@@ -383,36 +370,48 @@ async function send() {
         if (delta) appendDelta(delta);
       }
     }
-
-    cursor.remove();
-
-    if (nTokens > 0) {
-      conversation.push({ role: "assistant", content: full });
-      const ttftMs = firstTokenAt - t0;
-      const genSec = Math.max((lastTokenAt - firstTokenAt) / 1000, 1e-3);
-      const tps = nTokens > 1 ? (nTokens - 1) / genSec : nTokens / genSec;
-      const stats = document.createElement("div");
-      stats.className = "stats";
-      stats.textContent = fmtStats(ttftMs, tps, nTokens);
-      wrap.appendChild(stats);
-      setBadge(ttftMs, tps);
-    } else {
-      wrap.remove();
-      conversation.pop(); // keep history consistent with what the model saw
-      addSystem("The server responded but sent no tokens — check the model is loaded.");
-    }
   } catch (err) {
-    cursor.remove();
-    wrap.remove();
-    conversation.pop();
-    addSystem("Can't reach the server — is llama-server running? See server.md (" +
-              (err && err.message ? err.message : err) + ")");
-  } finally {
-    busy = false;
-    els.send.disabled = false;
-    els.prompt.focus();
-    scrollToBottom();
+    if (err && err.name === "AbortError") {
+      stopped = true;   // user hit Stop — finalize whatever streamed
+    } else {
+      cursor.remove();
+      wrap.remove();
+      conversation.pop();
+      addSystem("Can't reach the server — is llama-server running? See server.md (" +
+                (err && err.message ? err.message : err) + ")");
+      setBusy(false);
+      aborter = null;
+      els.prompt.focus();
+      return;
+    }
   }
+
+  cursor.remove();
+  aborter = null;
+
+  if (nTokens > 0) {
+    // A stopped-but-nonempty response is still real conversation state.
+    conversation.push({ role: "assistant", content: full });
+    const ttftMs = firstTokenAt - t0;
+    const genSec = Math.max((lastTokenAt - firstTokenAt) / 1000, 1e-3);
+    const tps = nTokens > 1 ? (nTokens - 1) / genSec : nTokens / genSec;
+    addStats(wrap, ttftMs, tps, nTokens, stopped);
+    setBadge(ttftMs, tps);
+  } else {
+    wrap.remove();
+    conversation.pop(); // keep history consistent with what the model saw
+    addSystem(stopped
+      ? "Stopped before any tokens arrived."
+      : "The server responded but sent no tokens — check the model is loaded.");
+  }
+
+  setBusy(false);
+  els.prompt.focus();
+  scrollToBottom();
+}
+
+function stopGeneration() {
+  if (aborter) aborter.abort();
 }
 
 function autosize() {
@@ -421,6 +420,7 @@ function autosize() {
 }
 
 els.send.addEventListener("click", send);
+els.stop.addEventListener("click", stopGeneration);
 els.prompt.addEventListener("input", autosize);
 els.prompt.addEventListener("keydown", (e) => {
   if (e.key === "Enter" && !e.shiftKey) {
