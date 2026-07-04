@@ -28,11 +28,11 @@ llama.cpp builds, the quant sweep (or pre-quantized GGUFs for day-one and
 oversize architectures), `llama-bench` + perplexity, dashboard reports. Plus a
 copy-paste **CI template** that turns any public repo into an Arm benchmark lab.
 
-**2 · The findings** — what the harness discovered when we ran it: 9 models,
-6 lineages, 0.5B→12B. KleidiAI's real win lives at **Q8_0 (1.73× prefill)**,
+**2 · The findings** — what the harness discovered when we ran it: 13 models,
+7 lineages, 0.35B→12B. KleidiAI's real win lives at **Q8_0 (1.73× prefill)**,
 not Q4_0 where on/off benchmarks usually look; a **~3B decode crossover** with
 workload guidance; repack's **2× RAM cost**; a **0.54% measured noise floor**.
-Six findings, all reproducible: [docs/FINDINGS.md](docs/FINDINGS.md).
+Seven findings, all reproducible: [docs/FINDINGS.md](docs/FINDINGS.md).
 
 **3 · The live demo** — the numbers, running: an OpenAI-compatible
 `llama-server` on a free Arm runner, driven by a self-contained
@@ -49,7 +49,7 @@ Every number from real Neoverse N2 silicon. No GPU. No cloud account. **$0.**
 
 ---
 
-## The results — 9 models, 6 lineages, 0.5B → 12B
+## The results — 13 models, 7 lineages, 0.35B → 12B
 
 Every row measured on the same free runner; full sweeps (all quants, all three
 builds, thread scaling, perplexity) in [results/](results/).
@@ -58,19 +58,26 @@ builds, thread scaling, perplexity) in [results/](results/).
 
 | # | Model | Best config | Size (GB) | Prefill t/s | Decode t/s | $/Mtok |
 |--:|-------|-------------|----------:|------------:|-----------:|-------:|
-| 1 | Qwen2.5-0.5B-Instruct | Q8_0 · KleidiAI @ 4t | 0.50 | 466.1 | **125.1** | 0.00 (free) |
-| 2 | Qwen2.5-1.5B-Instruct | Q8_0 · KleidiAI @ 4t | 1.53 | 186.3 | 44.6 | 0.00 (free) |
-| 3 | SmolLM2-1.7B-Instruct | Q8_0 · KleidiAI @ 4t | 1.70 | 172.7 | 37.6 | 0.00 (free) |
-| 4 | gemma-4-E2B-it | Q4_0 @ 4t | 2.83 | 46.2 | 23.4 | 0.00 (free) |
-| 5 | Qwen2.5-3B-Instruct | Q8_0 · KleidiAI @ 4t | 3.06 | 107.7 | 23.3 | 0.00 (free) |
-| 6 | Phi-3.5-mini-instruct | Q4_0 · KleidiAI @ 4t | 2.03 | 54.4 | 18.6 | 0.00 (free) |
-| 7 | gemma-4-E4B-it | Q4_0 @ 4t | 4.50 | 28.0 | 12.5 | 0.00 (free) |
-| 8 | Qwythos-9B *(HF #1 trending)* | Q4_K_M · KleidiAI @ 4t | 5.24 | 21.6 | 6.5 | 0.00 (free) |
-| 9 | gemma-4-12B-it | Q4_0 · KleidiAI @ 4t | 6.28 | 16.4 | 6.0 | 0.00 (free) |
+| 1 | SmolLM2-360M-Instruct | Q8_0 · KleidiAI @ 4t | 0.36 | 327.9 | **152.8** | 0.00 (free) |
+| 2 | granite-4.0-350m | Q8_0 · KleidiAI @ 4t | 0.35 | 408.0 | 151.5 | 0.00 (free) |
+| 3 | Qwen2.5-0.5B-Instruct | Q8_0 · KleidiAI @ 4t | 0.50 | 466.1 | 125.1 | 0.00 (free) |
+| 4 | Qwen3-0.6B | Q8_0 · KleidiAI @ 4t | 0.75 | 204.9 | 89.0 | 0.00 (free) |
+| 5 | LFM2-700M | Q8_0 · KleidiAI @ 4t | 0.74 | **588.8** | 88.3 | 0.00 (free) |
+| 6 | Qwen2.5-1.5B-Instruct | Q8_0 · KleidiAI @ 4t | 1.53 | 186.3 | 44.6 | 0.00 (free) |
+| 7 | SmolLM2-1.7B-Instruct | Q8_0 · KleidiAI @ 4t | 1.70 | 172.7 | 37.6 | 0.00 (free) |
+| 8 | gemma-4-E2B-it | Q4_0 @ 4t | 2.83 | 46.2 | 23.4 | 0.00 (free) |
+| 9 | Qwen2.5-3B-Instruct | Q8_0 · KleidiAI @ 4t | 3.06 | 107.7 | 23.3 | 0.00 (free) |
+| 10 | Phi-3.5-mini-instruct | Q4_0 · KleidiAI @ 4t | 2.03 | 54.4 | 18.6 | 0.00 (free) |
+| 11 | gemma-4-E4B-it | Q4_0 @ 4t | 4.50 | 28.0 | 12.5 | 0.00 (free) |
+| 12 | Qwythos-9B *(HF #1 trending)* | Q4_K_M · KleidiAI @ 4t | 5.24 | 21.6 | 6.5 | 0.00 (free) |
+| 13 | gemma-4-12B-it | Q4_0 · KleidiAI @ 4t | 6.28 | 16.4 | 6.0 | 0.00 (free) |
 
 The **Gemma 4 ladder (E2B/E4B/12B) and Qwythos-9B were benchmarked days after
 release** — before HF→GGUF converter support existed — via KleidiBench's
 pre-quantized GGUF mode. New architecture ships → you get Arm numbers the same day.
+Rows 1–5 are a **same-parameter cohort** (five 0.5B-class architectures,
+identical sweep) — where LFM2's hybrid-conv design posted both the fastest
+prefill measured (588.8 tok/s) and the biggest KleidiAI gain (1.94×).
 
 **Live dashboards (GitHub Pages):**
 
@@ -91,8 +98,8 @@ pre-quantized GGUF mode. New architecture ships → you get Arm numbers the same
 Most on/off benchmarks test Q4_0 and conclude KleidiAI does ~nothing (1.01×) —
 because llama.cpp's **default** build already ships equivalent Arm repack kernels
 there. The flag's true win is **Q8_0, where the default path doesn't repack**:
-up to **1.73× prefill from one CMake flag**, reproduced across every family we
-measured. Only a 3-way comparison (naive / default / KleidiAI) makes both facts
+up to **1.73× prefill from one CMake flag**, reproduced across all 10 architectures we
+measured (1.23–1.94×). Only a 3-way comparison (naive / default / KleidiAI) makes both facts
 visible — that's why KleidiBench builds llama.cpp three times.
 
 Deep-dive on Qwen2.5-3B (F16 baseline + quality):
@@ -106,7 +113,7 @@ Deep-dive on Qwen2.5-3B (F16 baseline + quality):
 | Q8_0 — KleidiAI **off** | 3.06 | 62.2 | 20.3 | 6.3 | 17.11 |
 | Q8_0 — **KleidiAI on** | 3.06 | **107.7** | **23.3** | 6.1 | **17.11** |
 
-Six measured findings, with serving guidance (the ~3B decode crossover, repack's
+Seven measured findings, with serving guidance (the ~3B decode crossover, repack's
 2× RAM cost, the 0.54% CI noise floor, and more):
 **[docs/FINDINGS.md](docs/FINDINGS.md)**.
 

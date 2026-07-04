@@ -15,7 +15,7 @@ on-screen captions.
 | 2 One command | dark terminal, ≥16pt font | `kleidibench run Qwen/Qwen2.5-0.5B-Instruct` |
 | 3 Free Arm CI | Actions run log, `uname -m` → `aarch64` | [Actions tab](https://github.com/yannan000/kleidibench/actions) |
 | 4 Live chat | streaming tokens + TTFT/tok-s chips | [chat UI](https://yannan000.github.io/kleidibench/demo/chat.html) + local `llama-server` |
-| 5 Leaderboard | 9-model ladder, scroll the table | [leaderboard](https://yannan000.github.io/kleidibench/results/leaderboard.html) |
+| 5 Leaderboard | 13-model ladder, scroll the table | [leaderboard](https://yannan000.github.io/kleidibench/results/leaderboard.html) |
 | 6 End card | repo URL + track name, static 10s | make a title slide or use the README hero |
 
 ## Shot list
@@ -71,7 +71,7 @@ zoom on that line.
 ### 2:20–2:50 — The leaderboard + close (browser: leaderboard.html)
 Show the multi-model leaderboard, scroll the table.
 
-> "Nine models, six lineages, half a billion to twelve billion parameters —
+> "Thirteen models, seven lineages, 350 million to twelve billion parameters —
 > one ranked leaderboard: decode speed, KleidiAI gain, cost per million
 > tokens. Everything is MIT-licensed and reproducible with one command.
 > KleidiBench: prove your LLM runs faster on Arm."

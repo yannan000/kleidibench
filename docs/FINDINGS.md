@@ -114,7 +114,37 @@ the optimized build cannot hold — the 12B fit our 15.6 GB runner with just
 2.9 GB to spare *because* Q8_0 and anything larger was impossible. Size your
 Arm instances for ~2× the GGUF file size if you want the fast path.
 
-## 6. Free CI runners are viable Arm benchmark hardware
+## 6. Fixed-scale cohort: the kernel win is universal, and architecture picks the size of it
+
+Cross-size comparisons conflate size with architecture, so we ran a
+same-parameter cohort: five ~0.5B-class models, five vendors, identical sweep.
+The Q8_0 KleidiAI prefill gain appeared in **all five**:
+
+| Model (0.5B class) | Q8_0 prefill gain | Best decode tok/s |
+|--------------------|------------------:|------------------:|
+| LFM2-700M (Liquid, hybrid-conv) | **1.94×** | 88.3 |
+| Qwen2.5-0.5B | 1.41× | 125.1 |
+| SmolLM2-360M | 1.26× | 152.8 |
+| granite-4.0-350m (IBM) | 1.26× | 151.5 |
+| Qwen3-0.6B | 1.23× | 89.0 |
+
+Two things fall out:
+
+- **LFM2's hybrid-conv architecture is the biggest KleidiAI beneficiary we
+  measured anywhere** (1.94×), and its 588.8 tok/s Q8_0 prefill is the fastest
+  prefill in the entire 13-model dataset — at 700M parameters. If your
+  workload is prefill-heavy and the model quality fits, Liquid's architecture
+  is disproportionately rewarded on Arm.
+- Across 10 architectures measured overall, the gain now spans 1.23–1.94×:
+  **universal in direction, architecture-dependent in magnitude.** Which is
+  precisely why you benchmark *your* model instead of extrapolating someone
+  else's number.
+
+Caveat at fixed scale: tok/s across different tokenizers is not perfectly
+apples-to-apples (a "token" is a different amount of text per vocabulary);
+within-model comparisons (build vs build, quant vs quant) are exact.
+
+## 7. Free CI runners are viable Arm benchmark hardware
 
 Every number above came from GitHub's free `ubuntu-24.04-arm` runners: Neoverse
 N2 with `i8mm`/SVE2 — newer instructions than Oracle's free Ampere Altra (N1,

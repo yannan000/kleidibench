@@ -70,13 +70,14 @@ Quality is measured too (perplexity, bundled corpus): on the 3B, **Q8_0 costs
 only +1.3% vs F16 while being the fastest config**; Q4_0 is 3.4× smaller at
 +20%. The full size/speed/quality curve is in every report.
 
-The committed leaderboard now spans **9 models across 6 lineages, 0.5B→12B**:
+The committed leaderboard now spans **13 models across 7 lineages, 0.35B→12B**:
 the three Qwen sizes above, SmolLM2-1.7B, Phi-3.5-mini, the complete
 **Gemma 4 ladder (E2B / E4B / 12B)** — benchmarked days after release, before
 converter support existed, via KleidiBench's pre-quantized GGUF mode — and
-Qwythos-9B, the #1-trending model on Hugging Face at time of writing. The Q8_0
-KleidiAI prefill gain reproduced in **every** family (1.68–1.73× dense,
-1.25–1.36× on Gemma 4's E-series).
+Qwythos-9B, the #1-trending model on Hugging Face at time of writing. Plus a **same-parameter 0.5B cohort** (five architectures at fixed scale): the Q8_0
+KleidiAI prefill gain reproduced in **all 10 architectures measured (1.23–1.94×)** —
+with Liquid's LFM2 hybrid-conv taking both the biggest gain (1.94×) and the fastest
+prefill in the dataset (588.8 tok/s).
 
 The nuanced finding most entries won't have: at Q4_0, llama.cpp's *default*
 build already ships Arm repack kernels that match KleidiAI within 1% — the
