@@ -11,9 +11,8 @@
 
 ## Elevator pitch (one line)
 
-One command to prove how much faster your LLM runs on Arm with KleidiAI — a
-reproducible benchmark harness that runs entirely on free GitHub Actions arm64
-runners.
+KleidiBench turns "should we run this LLM on Arm — and how?" from a week of
+engineering into one free CI run that returns a decision, not just a number.
 
 ## Track
 
@@ -45,11 +44,18 @@ Fork the repo, push, and CI hands you your own Arm benchmark report. The
 benchmark is not just reproducible in principle — it re-runs automatically on
 every commit.
 
-**Why it should win:** it turns Arm's headline AI story ("KleidiAI accelerates
-your existing stack for free") into a number anyone can generate for their own
-model in minutes, using only Arm's own recommended stack (llama.cpp +
-KleidiAI), on hardware that costs nothing. It is simultaneously a benchmark
-result, a reusable tool, and a template for CI-based Arm performance testing.
+**Why it should win:** the real blocker to Arm adoption isn't speed — it's
+*uncertainty*. Arm cloud is marketed as 30–40% cheaper per vCPU, but teams
+don't capture that saving because "will OUR model perform?" costs an
+engineer-week to answer properly. KleidiBench collapses that week into one
+$0 CI run whose output is a **serving decision** (which quant, which build,
+what RAM, what quality cost, what $/Mtok), not a wall of numbers. And it
+keeps paying: day-one coverage of brand-new architectures (we benchmarked
+Gemma 4 before HF→GGUF converter support existed), an Arm
+performance-regression watchdog when pointed at llama.cpp nightlies, and a
+3-way methodology that structurally prevents the misleading on/off
+benchmarks common in this space. A benchmark result, a de-risking
+instrument, and permanent ecosystem infrastructure — in one repo.
 
 ## Measured results
 

@@ -2,7 +2,8 @@
 
 [![benchmark](https://github.com/yannan000/kleidibench/actions/workflows/benchmark.yml/badge.svg)](https://github.com/yannan000/kleidibench/actions/workflows/benchmark.yml)
 
-**One command to prove how much faster your LLM runs on Arm with KleidiAI.**
+**"Should we run this LLM on Arm — and how?" Answered in one free CI run:
+a serving decision (quant, build, RAM, quality cost, $/Mtok), not just a number.**
 
 KleidiBench takes any Hugging Face LLM, builds `llama.cpp` **three ways** — naive,
 default Arm path, and Arm's [KleidiAI](https://gitlab.arm.com/kleidi/kleidiai)
