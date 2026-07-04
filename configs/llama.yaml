@@ -1,0 +1,20 @@
+# Gated Llama sweep — requires the HF_TOKEN repo secret (read token) and
+# accepting the model licenses on huggingface.co first. huggingface_hub picks
+# up the HF_TOKEN env var automatically; the workflow exports it.
+#   Dispatch: Actions -> benchmark -> Run workflow -> config: configs/llama.yaml
+
+models:
+  - meta-llama/Llama-3.2-1B-Instruct
+  - meta-llama/Llama-3.2-3B-Instruct
+
+quants:
+  - Q8_0
+  - Q4_K_M
+  - Q4_0
+
+threads:
+  - 1
+  - 2
+  - 4
+
+quality: true
