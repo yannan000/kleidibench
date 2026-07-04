@@ -66,6 +66,15 @@ account, no server to maintain."*
 > `chat.html` works from `file://`, a local static server, or GitHub Pages
 > without any proxy.
 
+## Choosing a model
+
+`llama-server` loads **one model per process** — there is no hot-swap API. The
+chat UI's model selector therefore sets the *benchmark context*: pick any of
+the 9 benchmarked models to see its measured decode/prefill numbers in the
+strip, and hit **copy serve cmd** to get the exact `llama-server` command for
+it. Restart the server with that command and the live stats line under each
+response shows measured-vs-benchmark side by side (`68.2 tok/s · bench 70.9`).
+
 ## Browser chat UI
 
 Prefer a visual chat over the terminal? Open [`demo/chat.html`](chat.html)
