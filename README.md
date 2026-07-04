@@ -44,9 +44,14 @@ release** — before HF→GGUF converter support existed — via KleidiBench's
 pre-quantized GGUF mode. New architecture ships → you get Arm numbers the same day.
 
 **Live dashboards (GitHub Pages):**
-[📊 leaderboard](https://yannan000.github.io/kleidibench/results/leaderboard.html) ·
-[📈 3B deep-dive report](https://yannan000.github.io/kleidibench/results/Qwen2.5-3B-Instruct/report.html) ·
-[💬 chat demo UI](https://yannan000.github.io/kleidibench/demo/chat.html)
+
+| [📊 Interactive leaderboard](https://yannan000.github.io/kleidibench/results/leaderboard.html) | [📈 3B deep-dive report](https://yannan000.github.io/kleidibench/results/Qwen2.5-3B-Instruct/report.html) |
+|:--:|:--:|
+| [![Leaderboard](docs/assets/leaderboard.png)](https://yannan000.github.io/kleidibench/results/leaderboard.html) | [![3B report](docs/assets/report-3b.png)](https://yannan000.github.io/kleidibench/results/Qwen2.5-3B-Instruct/report.html) |
+
+| [💬 Chat demo UI — live TTFT / tok-s per response](https://yannan000.github.io/kleidibench/demo/chat.html) |
+|:--:|
+| [![Chat demo](docs/assets/chat.png)](https://yannan000.github.io/kleidibench/demo/chat.html) |
 
 ---
 

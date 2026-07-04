@@ -338,7 +338,10 @@ def _svg_bars(pairs, title="", width=760, bar_h=26, gap=10) -> str:
     if not pairs:
         return ""
     maxv = max(v for _, v in pairs) or 1
-    label_w, val_w, pad = 120, 60, 8
+    # Label column sized to the longest name (~7.5px/char at 12px mono) so
+    # long model names never run under the bars.
+    label_w = max(120, min(320, int(max(len(n) for n, _ in pairs) * 7.5) + 12))
+    val_w, pad = 60, 8
     plot_w = width - label_w - val_w - pad * 2
     height = len(pairs) * (bar_h + gap) + 40
     parts = [f'<svg viewBox="0 0 {width} {height}" width="100%" '
