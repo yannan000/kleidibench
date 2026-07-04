@@ -1,18 +1,79 @@
-<!doctype html><html><head><meta charset="utf-8">
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KleidiBench leaderboard</title><style>
-body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:900px;
-margin:2rem auto;padding:0 1rem;color:#12203a}
-table{border-collapse:collapse;width:100%;margin-top:1rem}
-th,td{border:1px solid #d7dEEA;padding:.4rem .6rem;text-align:right}
-td:nth-child(2),td:nth-child(3){text-align:left}
-thead{background:#0b7285;color:#fff}
-.sub{color:#5b6b86} .bar{fill:#0b7285} .barlabel{font-size:12px;fill:#12203a}
+:root{--bg:#0a0c10;--surface:#111318;--panel:#14171c;--elev:#1e2024;
+--outline:#2b3139;--text:#e2e2e8;--dim:#bec8cc;--muted:#889296;
+--primary:#82d2e7;--primary-c:#0b7285;
+--sans:"Geist",-apple-system,"Segoe UI",Roboto,sans-serif;
+--mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);
+font:400 15px/1.6 var(--sans);font-variant-numeric:tabular-nums}
+header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+padding:14px 28px;background:var(--surface);border-bottom:1px solid var(--outline)}
+.brand{font:700 18px/1 var(--mono);color:var(--primary);letter-spacing:-.02em}
+.mtitle{font:600 15px/1 var(--sans);color:var(--text)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.hchip{font:400 12px/1 var(--mono);color:var(--dim);background:var(--elev);
+border:1px solid var(--outline);border-radius:6px;padding:6px 10px;white-space:nowrap}
+.stamp{margin-left:auto;font:400 12px/1 var(--mono);color:var(--muted)}
+main{max-width:980px;margin:0 auto;padding:28px 28px 40px}
+h1{font:600 28px/1.2 var(--sans);letter-spacing:-.02em;margin:.2em 0 .2em}
+.lede{color:var(--muted);margin-top:0}
+code{font:400 13px/1 var(--mono);color:var(--primary)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+gap:16px;margin:20px 0}
+.card{background:var(--panel);border:1px solid var(--outline);
+border-left:3px solid var(--primary-c);border-radius:10px;padding:18px 20px}
+.card h2{font:600 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;
+color:var(--muted);margin:0 0 14px}
+.bignums{display:flex;gap:12px;margin-bottom:14px}
+.bignum{flex:1;background:var(--elev);border-radius:8px;padding:12px 14px}
+.bignum .lab{font:600 10px/1.3 var(--mono);letter-spacing:.06em;
+text-transform:uppercase;color:var(--muted)}
+.bignum .val{font:600 26px/1.2 var(--mono);color:var(--text)}
+.bignum .val small{font-size:13px;color:var(--primary);margin-left:4px}
+.krow{display:flex;justify-content:space-between;font:400 13px/1.9 var(--mono);
+color:var(--muted)}
+.krow b{color:var(--text);font-weight:600}
+.krow .up{color:var(--primary);font-weight:600}
+.panel{background:var(--panel);border:1px solid var(--outline);border-radius:10px;
+padding:18px 20px;margin:16px 0;overflow-x:auto}
+table{border-collapse:collapse;width:100%;font:400 13px/1.5 var(--mono)}
+th{font:600 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;
+color:var(--muted);text-align:right;padding:8px 10px;
+border-bottom:1px solid var(--outline)}
+td{color:var(--dim);text-align:right;padding:8px 10px;
+border-bottom:1px solid rgba(43,49,57,.5)}
+th:nth-child(-n+2),td:nth-child(-n+2){text-align:left}
+tr:last-child td{border-bottom:none}
+td:nth-child(2){color:var(--muted)}
+tr.hl td{color:var(--text)} tr.hl td:nth-child(2){color:var(--primary)}
+.foot{font:400 12px/1.6 var(--mono);color:var(--muted);margin-top:24px}
+.bar{fill:#0b7285}.barlabel{font:400 12px var(--mono);fill:#bec8cc}
+@media (prefers-color-scheme: light){
+:root{--bg:#f4f6f8;--surface:#ffffff;--panel:#ffffff;--elev:#eef1f4;
+--outline:#d5dde2;--text:#12203a;--dim:#3f4d63;--muted:#5b6b86;--primary:#0b7285}
+.barlabel{fill:#3f4d63}}
+
+.cfg{color:var(--muted);border:1px solid var(--outline);border-radius:5px;
+padding:2px 6px;margin-left:6px;font-size:11px}
+.gain{color:var(--primary)}
 </style></head><body>
-<h1>KleidiBench leaderboard</h1>
-<p class="sub">Best configuration per model &middot; Arm Neoverse N2</p>
-<svg viewBox="0 0 760 184" width="100%" xmlns="http://www.w3.org/2000/svg" role="img"><text x="0" y="20" class="barlabel" font-weight="700">Decode tok/s by model (best config)</text><text x="0" y="52" class="barlabel">gemma-4-12B-it</text><rect x="120" y="34" width="26" height="26" rx="3" class="bar"/><text x="154" y="52" class="barlabel">5.97</text><text x="0" y="88" class="barlabel">Qwen2.5-3B-Instruct</text><rect x="120" y="70" width="104" height="26" rx="3" class="bar"/><text x="232" y="88" class="barlabel">23.28</text><text x="0" y="124" class="barlabel">Qwen2.5-1.5B-Instruct</text><rect x="120" y="106" width="200" height="26" rx="3" class="bar"/><text x="328" y="124" class="barlabel">44.55</text><text x="0" y="160" class="barlabel">Qwen2.5-0.5B-Instruct</text><rect x="120" y="142" width="564" height="26" rx="3" class="bar"/><text x="692" y="160" class="barlabel">125.14</text></svg>
-<table><thead><tr><th>#</th><th>Model</th><th>Best config</th><th>Size GB</th>
-<th>Prefill t/s</th><th>Decode t/s</th><th>TTFT ms</th><th>KleidiAI gain</th>
-<th>$/Mtok (free host)</th></tr></thead><tbody><tr><td>1</td><td>Qwen2.5-0.5B-Instruct</td><td>Q8_0 / kleidiai-on @ 4t</td><td>0.495</td><td>466.1</td><td>125.14</td><td>1098.5</td><td>1.1x</td><td>0.00 (free)</td></tr><tr><td>2</td><td>Qwen2.5-1.5B-Instruct</td><td>Q8_0 / kleidiai-on @ 4t</td><td>1.533</td><td>186.27</td><td>44.55</td><td>2748.6</td><td>1.15x</td><td>0.00 (free)</td></tr><tr><td>3</td><td>Qwen2.5-3B-Instruct</td><td>Q8_0 / kleidiai-on @ 4t</td><td>3.06</td><td>107.72</td><td>23.28</td><td>4752.9</td><td>1.15x</td><td>0.00 (free)</td></tr><tr><td>4</td><td>gemma-4-12B-it</td><td>Q4_0 / kleidiai-on @ 4t</td><td>6.276</td><td>16.43</td><td>5.97</td><td>31162.1</td><td>1.03x</td><td>0.00 (free)</td></tr></tbody></table>
-<p class="sub">Generated by <code>kleidibench leaderboard</code>.</p>
-</body></html>
+<header><span class="brand">KleidiBench</span>
+<span class="mtitle">Leaderboard</span>
+<span class="chips"><span class="hchip">Arm Neoverse N2</span>
+<span class="hchip">best configuration per model</span></span>
+<span class="stamp">peak decode 125.14 tok/s</span></header>
+<main>
+<h1>Decode tok/s by model</h1>
+<p class="lede">Highest decode throughput across all builds and quants per
+model, measured on a free GitHub Actions arm64 runner.</p>
+<section class="panel"><svg viewBox="0 0 760 184" width="100%" xmlns="http://www.w3.org/2000/svg" role="img"><text x="0" y="20" class="barlabel" font-weight="700">Decode tok/s by model (best config)</text><text x="0" y="52" class="barlabel">gemma-4-12B-it</text><rect x="120" y="34" width="26" height="26" rx="3" class="bar"/><text x="154" y="52" class="barlabel">5.97</text><text x="0" y="88" class="barlabel">Qwen2.5-3B-Instruct</text><rect x="120" y="70" width="104" height="26" rx="3" class="bar"/><text x="232" y="88" class="barlabel">23.28</text><text x="0" y="124" class="barlabel">Qwen2.5-1.5B-Instruct</text><rect x="120" y="106" width="200" height="26" rx="3" class="bar"/><text x="328" y="124" class="barlabel">44.55</text><text x="0" y="160" class="barlabel">Qwen2.5-0.5B-Instruct</text><rect x="120" y="142" width="564" height="26" rx="3" class="bar"/><text x="692" y="160" class="barlabel">125.14</text></svg></section>
+<section class="panel"><table><thead><tr><th>#</th><th>Model</th>
+<th>Best config</th><th>Size GB</th><th>Prefill t/s</th><th>Decode t/s</th>
+<th>TTFT ms</th><th>KleidiAI gain</th><th>$/Mtok (free host)</th>
+</tr></thead><tbody><tr class="hl"><td>1</td><td>Qwen2.5-0.5B-Instruct</td><td>Q8_0 <span class='cfg'>kleidiai-on @ 4t</span></td><td>0.495</td><td>466.1</td><td>125.14</td><td>1098.5</td><td class='gain'>1.1x</td><td>0.00 (free)</td></tr><tr><td>2</td><td>Qwen2.5-1.5B-Instruct</td><td>Q8_0 <span class='cfg'>kleidiai-on @ 4t</span></td><td>1.533</td><td>186.27</td><td>44.55</td><td>2748.6</td><td class='gain'>1.15x</td><td>0.00 (free)</td></tr><tr><td>3</td><td>Qwen2.5-3B-Instruct</td><td>Q8_0 <span class='cfg'>kleidiai-on @ 4t</span></td><td>3.06</td><td>107.72</td><td>23.28</td><td>4752.9</td><td class='gain'>1.15x</td><td>0.00 (free)</td></tr><tr><td>4</td><td>gemma-4-12B-it</td><td>Q4_0 <span class='cfg'>kleidiai-on @ 4t</span></td><td>6.276</td><td>16.43</td><td>5.97</td><td>31162.1</td><td class='gain'>1.03x</td><td>0.00 (free)</td></tr></tbody></table></section>
+<p class="foot">Generated by <code>kleidibench leaderboard</code> · per-model
+detail in each report.html · github.com/yannan000/kleidibench</p>
+</main></body></html>
