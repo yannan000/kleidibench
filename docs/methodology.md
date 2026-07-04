@@ -72,4 +72,11 @@ with `KLEIDIBENCH_PERFIX_CMD` (placeholders `{out}` and `{cmd}`).
 
 Every `results/<model>/results.json` records host info, llama.cpp commit, and
 run parameters. Re-run `kleidibench run <model>` on the same instance type and
-expect numbers within run-to-run noise (a few %).
+expect numbers within run-to-run noise.
+
+**Measured noise floor:** we ran the identical 3B sweep twice on two different
+GitHub arm64 runner instances several hours apart (git history: commits
+`36437f4` vs `f2ed91b`). Across all 28 matched (quant × build × threads)
+configurations, tok/s deviated by **median 0.54%, mean 0.81%, max 2.96%** —
+comfortably below every effect the reports claim (smallest headline effect:
+Q8_0 decode gain, +13–15%).

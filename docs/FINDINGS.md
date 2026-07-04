@@ -92,10 +92,13 @@ though Q8_0 wins on speed and quality.
 
 Every number above came from GitHub's free `ubuntu-24.04-arm` runners: Neoverse
 N2 with `i8mm`/SVE2 — newer instructions than Oracle's free Ampere Altra (N1,
-dotprod only). Run-to-run variance across our repetitions stayed within a few
-percent (llama-bench reports averaged reps). For relative comparisons — build
-vs build, quant vs quant, on the same job — CI runners are more than adequate,
-and they make the benchmark **reproducible by anyone with a GitHub account**.
+dotprod only). And we measured the noise, not just asserted it: the identical
+3B sweep run twice, hours apart, on two different runner instances agreed to
+**median 0.54% / max 2.96%** across all 28 configurations (see
+[methodology](methodology.md)) — an order of magnitude below the smallest
+effect reported here. For relative comparisons — build vs build, quant vs
+quant — CI runners are more than adequate, and they make the benchmark
+**reproducible by anyone with a GitHub account**.
 
 ---
 
