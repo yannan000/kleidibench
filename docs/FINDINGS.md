@@ -88,7 +88,23 @@ RAM subtlety: Q8_0's *runtime* peak RSS is as high as F16's because of the
 repacked weight copies — on RAM-constrained hosts Q4_0 wins on footprint even
 though Q8_0 wins on speed and quality.
 
-## 5. Free CI runners are viable Arm benchmark hardware
+## 5. Arm repack buys speed with RAM — 2× resident memory
+
+The optimization has a price nobody quotes: repacked weights are a *copy*.
+Gemma 4 12B, Q4_0 (6.3 GB on disk), 4 threads:
+
+| Build | Prefill tok/s | Decode tok/s | Peak RSS |
+|-------|--------------:|-------------:|---------:|
+| naive (no repack) | 6.9 | 3.9 | **6.7 GB** |
+| llama.cpp default / KleidiAI | 16.4 | 6.0 | **12.7 GB** |
+
+Same pattern at every size we measured (3B: 1.9 vs 3.5 GB). Deployment
+implication: on RAM-constrained hosts, `-DGGML_CPU_REPACK=OFF` runs models
+the optimized build cannot hold — the 12B fit our 15.6 GB runner with just
+2.9 GB to spare *because* Q8_0 and anything larger was impossible. Size your
+Arm instances for ~2× the GGUF file size if you want the fast path.
+
+## 6. Free CI runners are viable Arm benchmark hardware
 
 Every number above came from GitHub's free `ubuntu-24.04-arm` runners: Neoverse
 N2 with `i8mm`/SVE2 — newer instructions than Oracle's free Ampere Altra (N1,
