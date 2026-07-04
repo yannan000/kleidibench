@@ -1,15 +1,16 @@
 # Cross-family sweep — models available immediately (no review queue).
 #   - Phi-3.5-mini and SmolLM2 are fully ungated.
-#   - gemma-2-2b-it is gated with INSTANT approval: click "Acknowledge
-#     license" on its HF page once and the HF_TOKEN secret can fetch it.
+#   - gemma-3-4b-it is gated with INSTANT approval: click "Acknowledge
+#     license" on https://huggingface.co/google/gemma-3-4b-it once and the
+#     HF_TOKEN secret can fetch it.
 # A failed model no longer aborts the sweep, so it's safe to dispatch even
 # before the Gemma license click.
 #   Dispatch: Actions -> benchmark -> Run workflow -> config: configs/crossfamily.yaml
 
 models:
   - HuggingFaceTB/SmolLM2-1.7B-Instruct
-  - google/gemma-2-2b-it
-  - microsoft/Phi-3.5-mini-instruct   # 3.8B — largest; benched last
+  - microsoft/Phi-3.5-mini-instruct   # 3.8B
+  - google/gemma-3-4b-it              # 4B — largest; benched last (disk headroom)
 
 quants:
   - Q8_0
