@@ -46,7 +46,7 @@ averaged `avg_ts` it reports. Defaults: `-p 512 -n 128`.
 - **Warm cache**: `-r 3` repetitions; llama-bench discards obvious outliers.
 - **Thread sweep**: 1 → half → full cores, so throughput-vs-threads is explicit
   rather than a single cherry-picked point.
-- **Same everything**: identical commit/model/flags across ON and OFF.
+- **Same everything**: identical commit/model/flags across all three builds.
 - **Pinning (optional)**: for the tightest numbers, run under
   `taskset -c 0-<n>` and disable other workloads on the box.
 

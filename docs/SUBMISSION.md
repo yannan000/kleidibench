@@ -26,13 +26,14 @@ Cloud AI (Track 2)
 Arm's KleidiAI micro-kernels promise faster LLM inference on Arm CPUs with *no
 code changes* — just flip llama.cpp's `GGML_CPU_KLEIDIAI` CMake flag. But how
 much faster, for *your* model, on *your* instance? Most developers never find
-out, because setting up a fair A/B benchmark (two builds, identical
+out, because setting up a fair A/B/C benchmark (three builds, identical
 everything, multiple quant formats, multiple thread counts, parsed and
 charted) is an afternoon of yak-shaving.
 
 KleidiBench makes it one command. `kleidibench run <any-hf-model>`:
 
-1. builds llama.cpp twice — KleidiAI ON and OFF — same commit, same flags otherwise
+1. builds llama.cpp three ways — naive (no Arm repack), llama.cpp's default
+   Arm path, and KleidiAI — same commit, same flags otherwise
 2. converts the model to GGUF and quantizes it (F16 → Q8_0 → Q4_K_M → Q4_0)
 3. runs `llama-bench` across every (build × quant × thread-count) combination
 4. emits `report.md` + a standalone `report.html` leaderboard with charts —

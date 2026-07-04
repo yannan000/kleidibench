@@ -83,7 +83,8 @@ Prefer to run it yourself on any Arm64 Linux box?
 ```bash
 git clone <this-repo> && cd kleidibench
 python3 -m pip install -e .
-kleidibench run meta-llama/Llama-3.2-3B    # -> results/<model>/report.md + report.html
+kleidibench run Qwen/Qwen2.5-3B-Instruct   # ungated, no HF login needed
+# -> results/<model>/report.md + report.html
 kleidibench sweep configs/leaderboard.yaml # multi-model leaderboard
 ```
 
@@ -98,7 +99,7 @@ for how the numbers are measured.
 ```
 kleidibench run <hf-model>
     │
-    ├─ build.py     clone llama.cpp, cmake two builds: KleidiAI ON and OFF
+    ├─ build.py     clone llama.cpp, cmake 3 builds: naive / default Arm / KleidiAI
     ├─ quantize.py  convert HF -> GGUF, quantize to Q8_0 / Q4_K_M / Q4_0
     ├─ bench.py     run llama-bench per (build × quant), parse tok/s + RAM
     ├─ perfix.py    (optional) capture Arm Performix profile
