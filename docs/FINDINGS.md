@@ -23,9 +23,11 @@ and land within 1% of each other. At **Q8_0 the default path does not repack**,
 while KleidiAI's `i8mm` micro-kernels do kick in — a genuine 1.73× prefill win
 from one build flag.
 
-The 1.73× Q8_0 prefill gain reproduced across **four model families**
-(Qwen 1.73×, SmolLM2 1.68×, Phi-3.5 1.73×, and scaled variants) — it is a
-property of the kernels, not of one model.
+The Q8_0 prefill gain reproduced across **every family we measured** — and
+its size tells you about the architecture: dense transformers land at
+1.68–1.73× (Qwen 1.73×, SmolLM2 1.68×, Phi-3.5 1.73×), while Gemma 4's
+MatFormer-style E-series shows a smaller but real 1.25–1.36× (E2B/E4B) —
+the kernel win is universal, its magnitude is architecture-dependent.
 
 Practical takeaway: **if you serve Q8_0 on Arm, build with KleidiAI — it is
 free speed.** For models up to ~3B, Q8_0+KleidiAI was the fastest

@@ -1,0 +1,74 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KleidiBench — gemma-4-E2B-it</title><style>
+:root{--bg:#0a0c10;--surface:#111318;--panel:#14171c;--elev:#1e2024;
+--outline:#2b3139;--text:#e2e2e8;--dim:#bec8cc;--muted:#889296;
+--primary:#82d2e7;--primary-c:#0b7285;
+--sans:"Geist",-apple-system,"Segoe UI",Roboto,sans-serif;
+--mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);
+font:400 15px/1.6 var(--sans);font-variant-numeric:tabular-nums}
+header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+padding:14px 28px;background:var(--surface);border-bottom:1px solid var(--outline)}
+.brand{font:700 18px/1 var(--mono);color:var(--primary);letter-spacing:-.02em}
+.mtitle{font:600 15px/1 var(--sans);color:var(--text)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.hchip{font:400 12px/1 var(--mono);color:var(--dim);background:var(--elev);
+border:1px solid var(--outline);border-radius:6px;padding:6px 10px;white-space:nowrap}
+.stamp{margin-left:auto;font:400 12px/1 var(--mono);color:var(--muted)}
+main{max-width:980px;margin:0 auto;padding:28px 28px 40px}
+h1{font:600 28px/1.2 var(--sans);letter-spacing:-.02em;margin:.2em 0 .2em}
+.lede{color:var(--muted);margin-top:0}
+code{font:400 13px/1 var(--mono);color:var(--primary)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+gap:16px;margin:20px 0}
+.card{background:var(--panel);border:1px solid var(--outline);
+border-left:3px solid var(--primary-c);border-radius:10px;padding:18px 20px}
+.card h2{font:600 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;
+color:var(--muted);margin:0 0 14px}
+.bignums{display:flex;gap:12px;margin-bottom:14px}
+.bignum{flex:1;background:var(--elev);border-radius:8px;padding:12px 14px}
+.bignum .lab{font:600 10px/1.3 var(--mono);letter-spacing:.06em;
+text-transform:uppercase;color:var(--muted)}
+.bignum .val{font:600 26px/1.2 var(--mono);color:var(--text)}
+.bignum .val small{font-size:13px;color:var(--primary);margin-left:4px}
+.krow{display:flex;justify-content:space-between;font:400 13px/1.9 var(--mono);
+color:var(--muted)}
+.krow b{color:var(--text);font-weight:600}
+.krow .up{color:var(--primary);font-weight:600}
+.panel{background:var(--panel);border:1px solid var(--outline);border-radius:10px;
+padding:18px 20px;margin:16px 0;overflow-x:auto}
+table{border-collapse:collapse;width:100%;font:400 13px/1.5 var(--mono)}
+th{font:600 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;
+color:var(--muted);text-align:right;padding:8px 10px;
+border-bottom:1px solid var(--outline)}
+td{color:var(--dim);text-align:right;padding:8px 10px;
+border-bottom:1px solid rgba(43,49,57,.5)}
+th:nth-child(-n+2),td:nth-child(-n+2){text-align:left}
+tr:last-child td{border-bottom:none}
+td:nth-child(2){color:var(--muted)}
+tr.hl td{color:var(--text)} tr.hl td:nth-child(2){color:var(--primary)}
+.foot{font:400 12px/1.6 var(--mono);color:var(--muted);margin-top:24px}
+.bar{fill:#0b7285}.barlabel{font:400 12px var(--mono);fill:#bec8cc}
+@media (prefers-color-scheme: light){
+:root{--bg:#f4f6f8;--surface:#ffffff;--panel:#ffffff;--elev:#eef1f4;
+--outline:#d5dde2;--text:#12203a;--dim:#3f4d63;--muted:#5b6b86;--primary:#0b7285}
+.barlabel{fill:#3f4d63}}
+</style></head><body>
+<header><span class="brand">KleidiBench</span><span class="mtitle">gemma-4-E2B-it</span>
+<span class="chips"><span class='hchip'>Arm Neoverse N2</span><span class='hchip'>4 cores</span><span class='hchip'>15.6 GB</span><span class='hchip'>llama.cpp 2d973636e</span></span><span class="stamp">2026-07-04T15:56:10</span></header>
+<main>
+<h1>Arm optimization gains</h1>
+<p class="lede">Performance impact of Arm repack and KleidiAI kernels across
+quantization levels. Reproduce with <code>kleidibench run &lt;model&gt;</code>.</p>
+<div class="cards"><div class='card'><h2>Q4_0 quantization</h2><div class='bignums'><div class='bignum'><div class='lab'>vs naive (no Arm repack)</div><div class='val'>1.68&times;<small>Prefill</small></div></div><div class='bignum'><div class='lab'>vs naive (no Arm repack)</div><div class='val'>1.34&times;<small>Decode</small></div></div></div><div class='krow'><span>Prefill (tok/s)</span><span>46.23 &rarr; <b>46.45</b> <span class='up'>(1.0&times;)</span></span></div><div class='krow'><span>Decode (tok/s)</span><span>23.39 &rarr; <b>23.28</b> <span class='up'>(1.0&times;)</span></span></div><div class='krow'><span>KleidiAI vs llama.cpp default</span><span>@ 4 threads</span></div></div><div class='card'><h2>Q8_0 quantization</h2><div class='bignums'><div class='bignum'><div class='lab'>vs naive (no Arm repack)</div><div class='val'>1.78&times;<small>Prefill</small></div></div><div class='bignum'><div class='lab'>vs naive (no Arm repack)</div><div class='val'>1.38&times;<small>Decode</small></div></div></div><div class='krow'><span>Prefill (tok/s)</span><span>44.57 &rarr; <b>55.87</b> <span class='up'>(1.25&times;)</span></span></div><div class='krow'><span>Decode (tok/s)</span><span>20.84 &rarr; <b>23.32</b> <span class='up'>(1.12&times;)</span></span></div><div class='krow'><span>KleidiAI vs llama.cpp default</span><span>@ 4 threads</span></div></div></div>
+<section class="panel"><svg viewBox="0 0 760 148" width="100%" xmlns="http://www.w3.org/2000/svg" role="img"><text x="0" y="20" class="barlabel" font-weight="700">Decode tok/s (KleidiAI on, 4 threads)</text><text x="0" y="52" class="barlabel">Q4_K_M</text><rect x="120" y="34" width="517" height="26" rx="3" class="bar"/><text x="645" y="52" class="barlabel">21.38</text><text x="0" y="88" class="barlabel">Q4_0</text><rect x="120" y="70" width="563" height="26" rx="3" class="bar"/><text x="691" y="88" class="barlabel">23.28</text><text x="0" y="124" class="barlabel">Q8_0</text><rect x="120" y="106" width="564" height="26" rx="3" class="bar"/><text x="692" y="124" class="barlabel">23.32</text></svg></section>
+<section class="panel"><svg viewBox="0 0 760 268" width="100%" xmlns="http://www.w3.org/2000/svg" role="img"><text x="0" y="20" class="barlabel" font-weight="700">Thread scaling — decode tok/s (Q4_0)</text><rect x="8" y="32" width="12" height="12" rx="2" fill="#94a3b8"/><text x="25" y="42" class="barlabel">repack-off</text><rect x="117" y="32" width="12" height="12" rx="2" fill="#66b2c2"/><text x="134" y="42" class="barlabel">kleidiai-off</text><rect x="240" y="32" width="12" height="12" rx="2" fill="#0b7285"/><text x="257" y="42" class="barlabel">kleidiai-on</text><rect x="56.0" y="203.5" width="48.0" height="38.5" rx="3" fill="#94a3b8"/><text x="80.0" y="199.5" text-anchor="middle" class="barlabel">5.18</text><rect x="108.0" y="187.4" width="48.0" height="54.6" rx="3" fill="#66b2c2"/><text x="132.0" y="183.4" text-anchor="middle" class="barlabel">7.34</text><rect x="160.0" y="186.7" width="48.0" height="55.3" rx="3" fill="#0b7285"/><text x="184.0" y="182.7" text-anchor="middle" class="barlabel">7.44</text><text x="132.0" y="260" text-anchor="middle" class="barlabel">1 thr</text><rect x="304.0" y="173.1" width="48.0" height="68.9" rx="3" fill="#94a3b8"/><text x="328.0" y="169.1" text-anchor="middle" class="barlabel">9.26</text><rect x="356.0" y="144.8" width="48.0" height="97.2" rx="3" fill="#66b2c2"/><text x="380.0" y="140.8" text-anchor="middle" class="barlabel">13.06</text><rect x="408.0" y="143.5" width="48.0" height="98.5" rx="3" fill="#0b7285"/><text x="432.0" y="139.5" text-anchor="middle" class="barlabel">13.24</text><text x="380.0" y="260" text-anchor="middle" class="barlabel">2 thr</text><rect x="552.0" y="112.8" width="48.0" height="129.2" rx="3" fill="#94a3b8"/><text x="576.0" y="108.8" text-anchor="middle" class="barlabel">17.37</text><rect x="604.0" y="68.0" width="48.0" height="174.0" rx="3" fill="#66b2c2"/><text x="628.0" y="64.0" text-anchor="middle" class="barlabel">23.39</text><rect x="656.0" y="68.8" width="48.0" height="173.2" rx="3" fill="#0b7285"/><text x="680.0" y="64.8" text-anchor="middle" class="barlabel">23.28</text><text x="628.0" y="260" text-anchor="middle" class="barlabel">4 thr</text><line x1="8" y1="242" x2="752" y2="242" stroke="#d7deea"/></svg></section>
+<section class="panel"><table><thead><tr><th>Quant</th><th>Build</th><th>Threads</th>
+<th>Size GB</th><th>Prefill t/s</th><th>Decode t/s</th><th>TTFT ms</th>
+<th>Peak RAM GB</th><th>Perplexity</th></tr></thead>
+<tbody><tr><td>Q4_0</td><td>kleidiai-off</td><td>1</td><td>2.833</td><td>12.35</td><td>7.34</td><td>41462.8</td><td>4.218</td><td>76.8164</td></tr><tr><td>Q4_0</td><td>kleidiai-off</td><td>2</td><td>2.833</td><td>24.58</td><td>13.06</td><td>20834.1</td><td>4.218</td><td>76.8164</td></tr><tr><td>Q4_0</td><td>kleidiai-off</td><td>4</td><td>2.833</td><td>46.23</td><td>23.39</td><td>11075.9</td><td>4.218</td><td>76.8164</td></tr><tr class="hl"><td>Q4_0</td><td>kleidiai-on</td><td>1</td><td>2.833</td><td>12.39</td><td>7.44</td><td>41314.6</td><td>4.218</td><td>76.8164</td></tr><tr class="hl"><td>Q4_0</td><td>kleidiai-on</td><td>2</td><td>2.833</td><td>24.69</td><td>13.24</td><td>20734.1</td><td>4.218</td><td>76.8164</td></tr><tr class="hl"><td>Q4_0</td><td>kleidiai-on</td><td>4</td><td>2.833</td><td>46.45</td><td>23.28</td><td>11021.5</td><td>4.218</td><td>76.8164</td></tr><tr><td>Q4_0</td><td>repack-off</td><td>1</td><td>2.833</td><td>7.14</td><td>5.18</td><td>71669.8</td><td>3.055</td><td>76.8164</td></tr><tr><td>Q4_0</td><td>repack-off</td><td>2</td><td>2.833</td><td>14.32</td><td>9.26</td><td>35753.5</td><td>3.055</td><td>76.8164</td></tr><tr><td>Q4_0</td><td>repack-off</td><td>4</td><td>2.833</td><td>27.67</td><td>17.37</td><td>18500.6</td><td>3.055</td><td>76.8164</td></tr><tr><td>Q4_K_M</td><td>kleidiai-off</td><td>1</td><td>2.893</td><td>10.09</td><td>6.61</td><td>50718.9</td><td>4.362</td><td>91.9976</td></tr><tr><td>Q4_K_M</td><td>kleidiai-off</td><td>2</td><td>2.893</td><td>20.06</td><td>11.95</td><td>25517.4</td><td>4.362</td><td>91.9976</td></tr><tr><td>Q4_K_M</td><td>kleidiai-off</td><td>4</td><td>2.893</td><td>38.08</td><td>21.4</td><td>13446.8</td><td>4.362</td><td>91.9976</td></tr><tr class="hl"><td>Q4_K_M</td><td>kleidiai-on</td><td>1</td><td>2.893</td><td>10.08</td><td>6.55</td><td>50803.8</td><td>4.362</td><td>91.9976</td></tr><tr class="hl"><td>Q4_K_M</td><td>kleidiai-on</td><td>2</td><td>2.893</td><td>20.06</td><td>11.99</td><td>25521.1</td><td>4.362</td><td>91.9976</td></tr><tr class="hl"><td>Q4_K_M</td><td>kleidiai-on</td><td>4</td><td>2.893</td><td>38.14</td><td>21.38</td><td>13425.9</td><td>4.362</td><td>91.9976</td></tr><tr><td>Q4_K_M</td><td>repack-off</td><td>1</td><td>2.893</td><td>7.51</td><td>5.36</td><td>68175.6</td><td>3.117</td><td>91.9976</td></tr><tr><td>Q4_K_M</td><td>repack-off</td><td>2</td><td>2.893</td><td>14.96</td><td>9.87</td><td>34235.3</td><td>3.117</td><td>91.9976</td></tr><tr><td>Q4_K_M</td><td>repack-off</td><td>4</td><td>2.893</td><td>28.74</td><td>18.11</td><td>17812.9</td><td>3.116</td><td>91.9976</td></tr><tr><td>Q8_0</td><td>kleidiai-off</td><td>1</td><td>4.702</td><td>11.85</td><td>6.44</td><td>43207.7</td><td>7.158</td><td>97.2733</td></tr><tr><td>Q8_0</td><td>kleidiai-off</td><td>2</td><td>4.702</td><td>23.63</td><td>11.79</td><td>21670.7</td><td>7.158</td><td>97.2733</td></tr><tr><td>Q8_0</td><td>kleidiai-off</td><td>4</td><td>4.702</td><td>44.57</td><td>20.84</td><td>11486.8</td><td>7.158</td><td>97.2733</td></tr><tr class="hl"><td>Q8_0</td><td>kleidiai-on</td><td>1</td><td>4.702</td><td>15.01</td><td>7.22</td><td>34101.1</td><td>7.044</td><td>97.2733</td></tr><tr class="hl"><td>Q8_0</td><td>kleidiai-on</td><td>2</td><td>4.702</td><td>30.04</td><td>13.04</td><td>17045.0</td><td>7.044</td><td>97.2733</td></tr><tr class="hl"><td>Q8_0</td><td>kleidiai-on</td><td>4</td><td>4.702</td><td>55.87</td><td>23.32</td><td>9164.6</td><td>7.043</td><td>97.2733</td></tr><tr><td>Q8_0</td><td>repack-off</td><td>1</td><td>4.702</td><td>8.18</td><td>5.18</td><td>62623.5</td><td>4.924</td><td>97.2733</td></tr><tr><td>Q8_0</td><td>repack-off</td><td>2</td><td>4.702</td><td>16.31</td><td>9.17</td><td>31393.9</td><td>4.924</td><td>97.2733</td></tr><tr><td>Q8_0</td><td>repack-off</td><td>4</td><td>4.702</td><td>31.35</td><td>16.89</td><td>16331.5</td><td>4.924</td><td>97.2733</td></tr></tbody></table></section>
+<p class="foot">Generated by <code>kleidibench</code> · benchmarked on a free
+GitHub Actions arm64 runner · github.com/yannan000/kleidibench</p>
+</main></body></html>

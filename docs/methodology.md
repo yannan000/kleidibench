@@ -60,6 +60,13 @@ corpus-dependent; the meaningful signal is the **delta** between F16 and each
 quant on the same corpus. Quality is measured once per quant on the default
 build — quantization changes the math, KleidiAI only changes the speed.
 
+Caveat for pre-quantized (downloaded) GGUFs: without a same-source F16
+baseline, cross-quant PPL comparisons assume all files came from identical
+weights — community repos don't always guarantee that (we observed a Q8_0
+scoring *worse* than Q4_0 on one such model, which same-source quants can't
+do). Treat the PPL column as authoritative only for models KleidiBench
+quantized itself.
+
 ## Arm Performix (optional deep profile)
 
 With `--perfix`, KleidiBench wraps the Q4_0 / KleidiAI-on run in

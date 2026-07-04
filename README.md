@@ -54,7 +54,8 @@ Four honest takeaways:
   build comparison keeps that visible instead of hiding it.
 - **Quantization stacks on top: F16 → Q4_0 is 3.4× smaller and 3× faster prefill.**
 
-Full sweeps for Qwen2.5 0.5B / 1.5B / 3B (thread scaling, TTFT, RAM, all three builds)
+Full sweeps for **9 models across 6 lineages** (Qwen2.5 0.5B/1.5B/3B, SmolLM2,
+Phi-3.5, the complete Gemma 4 ladder E2B/E4B/12B, and HF-trending Qwythos-9B)
 in [results/](results/), including the combined [leaderboard](results/leaderboard.md).
 The full analysis — including why on/off-only benchmarks get this wrong — is in
 **[docs/FINDINGS.md](docs/FINDINGS.md)**.
