@@ -1,0 +1,17 @@
+# Qwythos-9B (HF #1 trending, July 2026) — community Qwen-derived distill,
+# Apache-2.0, GGUF-only repo. Q4_K_M only: the repo ships no Q4_0, and its
+# Q8_0 (~9.6 GB) would exceed runner RAM under Arm repack (~2x file size).
+# MTP variants skipped (multi-token prediction needs special decode handling).
+#   Dispatch: Actions -> benchmark -> Run workflow -> config: configs/qwythos-9b.yaml
+
+models:
+  - repo: empero-ai/Qwythos-9B-Claude-Mythos-5-1M-GGUF
+    name: Qwythos-9B
+    gguf:
+      Q4_K_M: Qwythos-9B-Claude-Mythos-5-1M-Q4_K_M.gguf
+
+threads:
+  - 2
+  - 4
+
+quality: true
