@@ -23,11 +23,19 @@ and land within 1% of each other. At **Q8_0 the default path does not repack**,
 while KleidiAI's `i8mm` micro-kernels do kick in — a genuine 1.73× prefill win
 from one build flag.
 
+The 1.73× Q8_0 prefill gain reproduced across **four model families**
+(Qwen 1.73×, SmolLM2 1.68×, Phi-3.5 1.73×, and scaled variants) — it is a
+property of the kernels, not of one model.
+
 Practical takeaway: **if you serve Q8_0 on Arm, build with KleidiAI — it is
-free speed.** Q8_0+KleidiAI was the fastest configuration we measured for
-*every* model in the sweep (e.g. 3B: 23.3 tok/s decode vs 19.4 for Q4_0),
+free speed.** For models up to ~3B, Q8_0+KleidiAI was the fastest
+configuration outright (e.g. Qwen 3B: 23.3 tok/s decode vs 19.4 for Q4_0)
 while also being the highest-quality quant (+1.3% perplexity vs F16 — see
-finding 4). If RAM allows, it dominates.
+finding 4). **Above ~3B a crossover appears**: decode is memory-bandwidth
+bound, so Q8_0's 2× bytes-per-token catches up — Phi-3.5 (3.8B) decodes
+faster at Q4_0 (18.6 vs 16.8 tok/s) while Q8_0 still wins prefill/TTFT
+decisively (81.8 vs 54.4 tok/s). Chat workloads (decode-heavy): Q4_0 past
+the crossover. Summarization/RAG (prefill-heavy): Q8_0 either way.
 
 ## 2. "Optimized for Arm" is mostly the repack path — and it's huge
 
