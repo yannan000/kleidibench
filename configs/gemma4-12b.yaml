@@ -1,0 +1,18 @@
+# Gemma 4 12B via pre-quantized GGUF (no F16 convert — the intermediate
+# wouldn't fit the runner). Q4_0 only: the file is ~7 GB and Arm repack
+# roughly doubles resident memory, so Q8_0 (~13 GB) cannot fit a 16 GB
+# runner, and even Q4_K_M is marginal. quality off: a 12B perplexity pass
+# has the same RAM profile and would risk the whole run.
+#   Dispatch: Actions -> benchmark -> Run workflow -> config: configs/gemma4-12b.yaml
+
+models:
+  - repo: unsloth/gemma-4-12B-it-GGUF
+    name: gemma-4-12B-it
+    gguf:
+      Q4_0: gemma-4-12b-it-Q4_0.gguf
+
+threads:
+  - 2
+  - 4
+
+quality: false

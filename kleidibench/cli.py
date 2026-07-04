@@ -54,11 +54,19 @@ def cmd_run(args) -> int:
              f"features={host.features} | threads={threads} | quants={quants}")
 
     builds = build_mod.build_all(ref=args.llama_ref, jobs=args.jobs)
-    arts = quant_mod.prepare_models(
-        args.model, quants=quants,
-        local_dir=Path(args.local_dir) if args.local_dir else None,
-        quantize_bin=builds["off"].llama_quantize,
-    )
+    gguf_files = getattr(args, "gguf_files", None)
+    if gguf_files:
+        # Pre-quantized mode: fetch ready-made GGUFs (no F16 convert) — for
+        # models whose F16 intermediate wouldn't fit the host.
+        arts = quant_mod.prepare_prequantized(
+            getattr(args, "model_name", None) or quant_mod.short_name(args.model),
+            args.model, gguf_files)
+    else:
+        arts = quant_mod.prepare_models(
+            args.model, quants=quants,
+            local_dir=Path(args.local_dir) if args.local_dir else None,
+            quantize_bin=builds["off"].llama_quantize,
+        )
 
     results: List[dict] = []
     for art in arts:
@@ -100,9 +108,11 @@ def cmd_run(args) -> int:
                 tag="q4_0-kleidiai-on")
 
     meta = {"llama_commit": build_mod.llama_commit(), "timestamp": util.timestamp(),
-            "n_prompt": args.n_prompt, "n_gen": args.n_gen, "reps": args.reps}
-    report_mod.write_report(quant_mod.short_name(args.model), results,
-                            host.to_dict(), meta)
+            "n_prompt": args.n_prompt, "n_gen": args.n_gen, "reps": args.reps,
+            "prequantized": bool(gguf_files)}
+    display = (getattr(args, "model_name", None)
+               or quant_mod.short_name(args.model))
+    report_mod.write_report(display, results, host.to_dict(), meta)
     return 0
 
 
@@ -119,6 +129,8 @@ def cmd_sweep(args) -> int:
             sub = argparse.Namespace(**vars(args))
             sub.model = m if isinstance(m, str) else m["repo"]
             sub.local_dir = None if isinstance(m, str) else m.get("local_dir")
+            sub.gguf_files = None if isinstance(m, str) else m.get("gguf")
+            sub.model_name = None if isinstance(m, str) else m.get("name")
             sub.quants = cfg.get("quants") and ",".join(cfg["quants"]) or args.quants
             sub.threads = cfg.get("threads") and ",".join(map(str, cfg["threads"])) or args.threads
             sub.quality = cfg.get("quality", args.quality)

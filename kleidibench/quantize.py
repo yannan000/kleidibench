@@ -138,3 +138,31 @@ def prepare_models(hf_repo: str, quants: Optional[List[str]] = None,
     if quantize_bin is None:
         raise ValueError("quantize_bin required — pass build['off'].llama_quantize")
     return quantize(f16, quants, quantize_bin)
+
+
+def prepare_prequantized(name: str, gguf_repo: str,
+                         files: dict) -> List[ModelArtifact]:
+    """Download ready-made GGUFs instead of converting from HF weights.
+
+    For models too large to convert on the benchmark host (the F16
+    intermediate of a 12B needs ~50 GB of disk+RAM), community GGUF repos
+    (ggml-org, unsloth, bartowski) already ship the quantized files. `files`
+    maps quant label -> filename in `gguf_repo`, e.g.
+    {"Q4_0": "gemma-4-12b-it-Q4_0.gguf"}. No F16 baseline in this mode."""
+    try:
+        from huggingface_hub import hf_hub_download
+    except ImportError as e:  # pragma: no cover - depends on optional extra
+        raise SystemExit("huggingface_hub not installed — pip install "
+                         "kleidibench[hf] for pre-quantized downloads.") from e
+    util.ensure_dirs()
+    arts = []
+    for quant, fname in files.items():
+        util.log(f"downloading {gguf_repo}/{fname} ...")
+        local = Path(hf_hub_download(repo_id=gguf_repo, filename=fname))
+        # Symlink into the standard cache layout so bench/report paths and
+        # any later llama-server usage stay uniform.
+        dest = util.MODELS / f"{name}-{quant}.gguf"
+        if not dest.exists():
+            dest.symlink_to(local)
+        arts.append(_artifact(name, quant, dest))
+    return arts
