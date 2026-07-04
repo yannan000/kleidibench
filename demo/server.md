@@ -59,6 +59,13 @@ responsiveness back to the measured KleidiAI speedup. Headline line:
 *"This is running on a real Arm64 CPU that costs me nothing — no cloud
 account, no server to maintain."*
 
+> **Verified end-to-end** (llama-server `b1-2d97363`, Qwen2.5-0.5B Q4_0):
+> health endpoint, `--api-key` auth, SSE streaming, and `demo_client.py`
+> stats all work as documented; llama-server sends proper CORS headers
+> (`Access-Control-Allow-Origin` echoes the requesting origin), so
+> `chat.html` works from `file://`, a local static server, or GitHub Pages
+> without any proxy.
+
 ## Browser chat UI
 
 Prefer a visual chat over the terminal? Open [`demo/chat.html`](chat.html)
