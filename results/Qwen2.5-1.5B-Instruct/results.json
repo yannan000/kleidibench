@@ -19,7 +19,7 @@
   },
   "meta": {
     "llama_commit": "d4cff114c",
-    "timestamp": "2026-07-03T21:32:41",
+    "timestamp": "2026-07-04T00:17:32",
     "n_prompt": 512,
     "n_gen": 128,
     "reps": 3
@@ -29,40 +29,15 @@
       "model": "Qwen2.5-1.5B-Instruct",
       "quant": "F16",
       "build": "kleidiai-off",
-      "threads": 1,
+      "threads": 4,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 13.14,
-      "decode_tps": 6.03,
-      "ttft_ms": 38959.2,
-      "peak_ram_gb": 3.024,
-      "size_gb": 2.881
-    },
-    {
-      "model": "Qwen2.5-1.5B-Instruct",
-      "quant": "F16",
-      "build": "kleidiai-off",
-      "threads": 2,
-      "n_prompt": 512,
-      "n_gen": 128,
-      "prefill_tps": 25.13,
-      "decode_tps": 10.98,
-      "ttft_ms": 20371.6,
+      "prefill_tps": 50.07,
+      "decode_tps": 20.58,
+      "ttft_ms": 10224.9,
       "peak_ram_gb": 3.023,
-      "size_gb": 2.881
-    },
-    {
-      "model": "Qwen2.5-1.5B-Instruct",
-      "quant": "F16",
-      "build": "kleidiai-off",
-      "threads": 4,
-      "n_prompt": 512,
-      "n_gen": 128,
-      "prefill_tps": 50.15,
-      "decode_tps": 20.56,
-      "ttft_ms": 10209.4,
-      "peak_ram_gb": 3.023,
-      "size_gb": 2.881
+      "size_gb": 2.881,
+      "ppl": 20.0566
     },
     {
       "model": "Qwen2.5-1.5B-Instruct",
@@ -71,11 +46,12 @@
       "threads": 1,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 17.07,
-      "decode_tps": 8.63,
-      "ttft_ms": 29986.1,
+      "prefill_tps": 16.66,
+      "decode_tps": 8.36,
+      "ttft_ms": 30738.3,
       "peak_ram_gb": 1.672,
-      "size_gb": 1.533
+      "size_gb": 1.533,
+      "ppl": 20.0899
     },
     {
       "model": "Qwen2.5-1.5B-Instruct",
@@ -84,11 +60,12 @@
       "threads": 2,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 33.04,
-      "decode_tps": 15.18,
-      "ttft_ms": 15496.1,
+      "prefill_tps": 32.73,
+      "decode_tps": 14.83,
+      "ttft_ms": 15644.5,
       "peak_ram_gb": 1.672,
-      "size_gb": 1.533
+      "size_gb": 1.533,
+      "ppl": 20.0899
     },
     {
       "model": "Qwen2.5-1.5B-Instruct",
@@ -97,11 +74,12 @@
       "threads": 4,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 66.26,
-      "decode_tps": 28.64,
-      "ttft_ms": 7727.7,
-      "peak_ram_gb": 1.672,
-      "size_gb": 1.533
+      "prefill_tps": 65.84,
+      "decode_tps": 28.04,
+      "ttft_ms": 7776.8,
+      "peak_ram_gb": 1.669,
+      "size_gb": 1.533,
+      "ppl": 20.0899
     },
     {
       "model": "Qwen2.5-1.5B-Instruct",
@@ -110,11 +88,12 @@
       "threads": 1,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 30.95,
-      "decode_tps": 11.58,
-      "ttft_ms": 16543.1,
-      "peak_ram_gb": 3.181,
-      "size_gb": 1.533
+      "prefill_tps": 30.81,
+      "decode_tps": 11.35,
+      "ttft_ms": 16620.3,
+      "peak_ram_gb": 3.186,
+      "size_gb": 1.533,
+      "ppl": 20.0899
     },
     {
       "model": "Qwen2.5-1.5B-Instruct",
@@ -123,11 +102,12 @@
       "threads": 2,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 58.5,
-      "decode_tps": 21.56,
-      "ttft_ms": 8752.4,
+      "prefill_tps": 58.27,
+      "decode_tps": 21.39,
+      "ttft_ms": 8786.2,
       "peak_ram_gb": 3.186,
-      "size_gb": 1.533
+      "size_gb": 1.533,
+      "ppl": 20.0899
     },
     {
       "model": "Qwen2.5-1.5B-Instruct",
@@ -136,11 +116,12 @@
       "threads": 4,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 116.95,
-      "decode_tps": 39.78,
-      "ttft_ms": 4378.0,
+      "prefill_tps": 116.74,
+      "decode_tps": 38.72,
+      "ttft_ms": 4385.8,
       "peak_ram_gb": 3.186,
-      "size_gb": 1.533
+      "size_gb": 1.533,
+      "ppl": 20.0899
     },
     {
       "model": "Qwen2.5-1.5B-Instruct",
@@ -149,11 +130,12 @@
       "threads": 1,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 50.19,
-      "decode_tps": 12.92,
-      "ttft_ms": 10201.4,
+      "prefill_tps": 49.45,
+      "decode_tps": 12.75,
+      "ttft_ms": 10353.5,
       "peak_ram_gb": 3.113,
-      "size_gb": 1.533
+      "size_gb": 1.533,
+      "ppl": 20.0899
     },
     {
       "model": "Qwen2.5-1.5B-Instruct",
@@ -162,11 +144,12 @@
       "threads": 2,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 92.4,
-      "decode_tps": 24.41,
-      "ttft_ms": 5540.9,
+      "prefill_tps": 92.07,
+      "decode_tps": 24.05,
+      "ttft_ms": 5560.7,
       "peak_ram_gb": 3.114,
-      "size_gb": 1.533
+      "size_gb": 1.533,
+      "ppl": 20.0899
     },
     {
       "model": "Qwen2.5-1.5B-Instruct",
@@ -175,11 +158,12 @@
       "threads": 4,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 185.92,
-      "decode_tps": 44.98,
-      "ttft_ms": 2753.9,
+      "prefill_tps": 186.27,
+      "decode_tps": 44.55,
+      "ttft_ms": 2748.6,
       "peak_ram_gb": 3.113,
-      "size_gb": 1.533
+      "size_gb": 1.533,
+      "ppl": 20.0899
     },
     {
       "model": "Qwen2.5-1.5B-Instruct",
@@ -189,10 +173,11 @@
       "n_prompt": 512,
       "n_gen": 128,
       "prefill_tps": 15.08,
-      "decode_tps": 8.51,
-      "ttft_ms": 33952.3,
+      "decode_tps": 8.38,
+      "ttft_ms": 33952.8,
       "peak_ram_gb": 1.049,
-      "size_gb": 0.918
+      "size_gb": 0.918,
+      "ppl": 21.6528
     },
     {
       "model": "Qwen2.5-1.5B-Instruct",
@@ -201,11 +186,12 @@
       "threads": 2,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 29.21,
-      "decode_tps": 15.33,
-      "ttft_ms": 17526.6,
+      "prefill_tps": 29.3,
+      "decode_tps": 15.28,
+      "ttft_ms": 17476.4,
       "peak_ram_gb": 1.049,
-      "size_gb": 0.918
+      "size_gb": 0.918,
+      "ppl": 21.6528
     },
     {
       "model": "Qwen2.5-1.5B-Instruct",
@@ -214,11 +200,12 @@
       "threads": 4,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 58.43,
-      "decode_tps": 28.98,
-      "ttft_ms": 8762.8,
+      "prefill_tps": 58.55,
+      "decode_tps": 29.1,
+      "ttft_ms": 8744.7,
       "peak_ram_gb": 1.049,
-      "size_gb": 0.918
+      "size_gb": 0.918,
+      "ppl": 21.6528
     },
     {
       "model": "Qwen2.5-1.5B-Instruct",
@@ -227,11 +214,12 @@
       "threads": 1,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 23.37,
-      "decode_tps": 9.37,
-      "ttft_ms": 21910.0,
+      "prefill_tps": 23.32,
+      "decode_tps": 9.43,
+      "ttft_ms": 21954.7,
       "peak_ram_gb": 1.954,
-      "size_gb": 0.918
+      "size_gb": 0.918,
+      "ppl": 21.6528
     },
     {
       "model": "Qwen2.5-1.5B-Instruct",
@@ -240,11 +228,12 @@
       "threads": 2,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 44.58,
-      "decode_tps": 17.65,
-      "ttft_ms": 11485.9,
+      "prefill_tps": 44.55,
+      "decode_tps": 17.78,
+      "ttft_ms": 11492.5,
       "peak_ram_gb": 1.954,
-      "size_gb": 0.918
+      "size_gb": 0.918,
+      "ppl": 21.6528
     },
     {
       "model": "Qwen2.5-1.5B-Instruct",
@@ -253,11 +242,12 @@
       "threads": 4,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 89.43,
-      "decode_tps": 32.96,
-      "ttft_ms": 5725.0,
+      "prefill_tps": 89.58,
+      "decode_tps": 32.78,
+      "ttft_ms": 5715.7,
       "peak_ram_gb": 1.954,
-      "size_gb": 0.918
+      "size_gb": 0.918,
+      "ppl": 21.6528
     },
     {
       "model": "Qwen2.5-1.5B-Instruct",
@@ -266,11 +256,12 @@
       "threads": 1,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 23.39,
-      "decode_tps": 9.37,
-      "ttft_ms": 21892.2,
+      "prefill_tps": 23.41,
+      "decode_tps": 9.4,
+      "ttft_ms": 21872.1,
       "peak_ram_gb": 1.955,
-      "size_gb": 0.918
+      "size_gb": 0.918,
+      "ppl": 21.6528
     },
     {
       "model": "Qwen2.5-1.5B-Instruct",
@@ -279,11 +270,12 @@
       "threads": 2,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 44.52,
-      "decode_tps": 17.74,
-      "ttft_ms": 11500.2,
+      "prefill_tps": 44.63,
+      "decode_tps": 17.73,
+      "ttft_ms": 11472.8,
       "peak_ram_gb": 1.954,
-      "size_gb": 0.918
+      "size_gb": 0.918,
+      "ppl": 21.6528
     },
     {
       "model": "Qwen2.5-1.5B-Instruct",
@@ -292,11 +284,12 @@
       "threads": 4,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 89.48,
-      "decode_tps": 32.88,
-      "ttft_ms": 5722.1,
+      "prefill_tps": 89.68,
+      "decode_tps": 32.45,
+      "ttft_ms": 5709.1,
       "peak_ram_gb": 1.954,
-      "size_gb": 0.918
+      "size_gb": 0.918,
+      "ppl": 21.6528
     },
     {
       "model": "Qwen2.5-1.5B-Instruct",
@@ -305,11 +298,12 @@
       "threads": 1,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 14.17,
-      "decode_tps": 7.91,
-      "ttft_ms": 36124.6,
+      "prefill_tps": 13.97,
+      "decode_tps": 7.84,
+      "ttft_ms": 36649.5,
       "peak_ram_gb": 1.001,
-      "size_gb": 0.871
+      "size_gb": 0.871,
+      "ppl": 22.1234
     },
     {
       "model": "Qwen2.5-1.5B-Instruct",
@@ -318,11 +312,12 @@
       "threads": 2,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 27.76,
-      "decode_tps": 14.03,
-      "ttft_ms": 18443.9,
+      "prefill_tps": 27.83,
+      "decode_tps": 14.0,
+      "ttft_ms": 18397.2,
       "peak_ram_gb": 1.001,
-      "size_gb": 0.871
+      "size_gb": 0.871,
+      "ppl": 22.1234
     },
     {
       "model": "Qwen2.5-1.5B-Instruct",
@@ -331,11 +326,12 @@
       "threads": 4,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 55.75,
-      "decode_tps": 26.79,
-      "ttft_ms": 9183.8,
+      "prefill_tps": 55.81,
+      "decode_tps": 26.64,
+      "ttft_ms": 9174.6,
       "peak_ram_gb": 1.001,
-      "size_gb": 0.871
+      "size_gb": 0.871,
+      "ppl": 22.1234
     },
     {
       "model": "Qwen2.5-1.5B-Instruct",
@@ -344,11 +340,12 @@
       "threads": 1,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 34.52,
-      "decode_tps": 10.56,
-      "ttft_ms": 14831.7,
+      "prefill_tps": 34.55,
+      "decode_tps": 10.53,
+      "ttft_ms": 14820.7,
       "peak_ram_gb": 1.859,
-      "size_gb": 0.871
+      "size_gb": 0.871,
+      "ppl": 22.1234
     },
     {
       "model": "Qwen2.5-1.5B-Instruct",
@@ -357,11 +354,12 @@
       "threads": 2,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 64.8,
-      "decode_tps": 19.14,
-      "ttft_ms": 7901.2,
+      "prefill_tps": 64.93,
+      "decode_tps": 19.15,
+      "ttft_ms": 7885.5,
       "peak_ram_gb": 1.859,
-      "size_gb": 0.871
+      "size_gb": 0.871,
+      "ppl": 22.1234
     },
     {
       "model": "Qwen2.5-1.5B-Instruct",
@@ -370,11 +368,12 @@
       "threads": 4,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 130.64,
-      "decode_tps": 35.88,
-      "ttft_ms": 3919.3,
+      "prefill_tps": 130.85,
+      "decode_tps": 36.02,
+      "ttft_ms": 3912.9,
       "peak_ram_gb": 1.859,
-      "size_gb": 0.871
+      "size_gb": 0.871,
+      "ppl": 22.1234
     },
     {
       "model": "Qwen2.5-1.5B-Instruct",
@@ -383,11 +382,12 @@
       "threads": 1,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 34.77,
-      "decode_tps": 10.82,
-      "ttft_ms": 14725.8,
+      "prefill_tps": 34.81,
+      "decode_tps": 10.73,
+      "ttft_ms": 14709.5,
       "peak_ram_gb": 1.859,
-      "size_gb": 0.871
+      "size_gb": 0.871,
+      "ppl": 22.1234
     },
     {
       "model": "Qwen2.5-1.5B-Instruct",
@@ -396,11 +396,12 @@
       "threads": 2,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 65.26,
-      "decode_tps": 19.48,
-      "ttft_ms": 7845.8,
+      "prefill_tps": 57.91,
+      "decode_tps": 19.4,
+      "ttft_ms": 8841.7,
       "peak_ram_gb": 1.859,
-      "size_gb": 0.871
+      "size_gb": 0.871,
+      "ppl": 22.1234
     },
     {
       "model": "Qwen2.5-1.5B-Instruct",
@@ -409,11 +410,12 @@
       "threads": 4,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 131.38,
-      "decode_tps": 35.96,
-      "ttft_ms": 3897.2,
+      "prefill_tps": 131.46,
+      "decode_tps": 35.73,
+      "ttft_ms": 3894.6,
       "peak_ram_gb": 1.859,
-      "size_gb": 0.871
+      "size_gb": 0.871,
+      "ppl": 22.1234
     }
   ]
 }

@@ -19,7 +19,7 @@
   },
   "meta": {
     "llama_commit": "d4cff114c",
-    "timestamp": "2026-07-03T22:58:41",
+    "timestamp": "2026-07-04T01:35:54",
     "n_prompt": 512,
     "n_gen": 128,
     "reps": 3
@@ -29,40 +29,15 @@
       "model": "Qwen2.5-3B-Instruct",
       "quant": "F16",
       "build": "kleidiai-off",
-      "threads": 1,
+      "threads": 4,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 5.84,
-      "decode_tps": 3.05,
-      "ttft_ms": 87719.3,
+      "prefill_tps": 23.43,
+      "decode_tps": 10.86,
+      "ttft_ms": 21849.1,
       "peak_ram_gb": 5.918,
-      "size_gb": 5.754
-    },
-    {
-      "model": "Qwen2.5-3B-Instruct",
-      "quant": "F16",
-      "build": "kleidiai-off",
-      "threads": 2,
-      "n_prompt": 512,
-      "n_gen": 128,
-      "prefill_tps": 11.75,
-      "decode_tps": 5.66,
-      "ttft_ms": 43589.8,
-      "peak_ram_gb": 5.918,
-      "size_gb": 5.754
-    },
-    {
-      "model": "Qwen2.5-3B-Instruct",
-      "quant": "F16",
-      "build": "kleidiai-off",
-      "threads": 4,
-      "n_prompt": 512,
-      "n_gen": 128,
-      "prefill_tps": 23.57,
-      "decode_tps": 10.65,
-      "ttft_ms": 21722.0,
-      "peak_ram_gb": 5.918,
-      "size_gb": 5.754
+      "size_gb": 5.754,
+      "ppl": 16.8845
     },
     {
       "model": "Qwen2.5-3B-Instruct",
@@ -71,11 +46,12 @@
       "threads": 1,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 8.36,
-      "decode_tps": 4.4,
-      "ttft_ms": 61232.4,
+      "prefill_tps": 8.25,
+      "decode_tps": 4.32,
+      "ttft_ms": 62057.5,
       "peak_ram_gb": 3.219,
-      "size_gb": 3.06
+      "size_gb": 3.06,
+      "ppl": 17.1097
     },
     {
       "model": "Qwen2.5-3B-Instruct",
@@ -84,24 +60,26 @@
       "threads": 2,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 16.68,
-      "decode_tps": 7.84,
-      "ttft_ms": 30697.6,
+      "prefill_tps": 16.61,
+      "decode_tps": 7.74,
+      "ttft_ms": 30822.5,
+      "peak_ram_gb": 3.214,
+      "size_gb": 3.06,
+      "ppl": 17.1097
+    },
+    {
+      "model": "Qwen2.5-3B-Instruct",
+      "quant": "Q8_0",
+      "build": "repack-off",
+      "threads": 4,
+      "n_prompt": 512,
+      "n_gen": 128,
+      "prefill_tps": 33.13,
+      "decode_tps": 14.74,
+      "ttft_ms": 15452.6,
       "peak_ram_gb": 3.219,
-      "size_gb": 3.06
-    },
-    {
-      "model": "Qwen2.5-3B-Instruct",
-      "quant": "Q8_0",
-      "build": "repack-off",
-      "threads": 4,
-      "n_prompt": 512,
-      "n_gen": 128,
-      "prefill_tps": 33.18,
-      "decode_tps": 15.01,
-      "ttft_ms": 15428.7,
-      "peak_ram_gb": 3.219,
-      "size_gb": 3.06
+      "size_gb": 3.06,
+      "ppl": 17.1097
     },
     {
       "model": "Qwen2.5-3B-Instruct",
@@ -110,11 +88,12 @@
       "threads": 1,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 15.76,
-      "decode_tps": 5.85,
-      "ttft_ms": 32479.8,
+      "prefill_tps": 15.69,
+      "decode_tps": 5.78,
+      "ttft_ms": 32622.6,
       "peak_ram_gb": 6.25,
-      "size_gb": 3.06
+      "size_gb": 3.06,
+      "ppl": 17.1097
     },
     {
       "model": "Qwen2.5-3B-Instruct",
@@ -123,11 +102,12 @@
       "threads": 2,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 31.5,
-      "decode_tps": 11.0,
-      "ttft_ms": 16256.1,
+      "prefill_tps": 31.37,
+      "decode_tps": 10.97,
+      "ttft_ms": 16322.4,
       "peak_ram_gb": 6.25,
-      "size_gb": 3.06
+      "size_gb": 3.06,
+      "ppl": 17.1097
     },
     {
       "model": "Qwen2.5-3B-Instruct",
@@ -136,11 +116,12 @@
       "threads": 4,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 62.48,
-      "decode_tps": 20.35,
-      "ttft_ms": 8195.0,
+      "prefill_tps": 62.22,
+      "decode_tps": 20.27,
+      "ttft_ms": 8228.8,
       "peak_ram_gb": 6.25,
-      "size_gb": 3.06
+      "size_gb": 3.06,
+      "ppl": 17.1097
     },
     {
       "model": "Qwen2.5-3B-Instruct",
@@ -149,11 +130,12 @@
       "threads": 1,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 26.95,
-      "decode_tps": 6.4,
-      "ttft_ms": 18998.3,
+      "prefill_tps": 26.49,
+      "decode_tps": 6.53,
+      "ttft_ms": 19327.8,
       "peak_ram_gb": 6.085,
-      "size_gb": 3.06
+      "size_gb": 3.06,
+      "ppl": 17.1097
     },
     {
       "model": "Qwen2.5-3B-Instruct",
@@ -162,11 +144,12 @@
       "threads": 2,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 54.34,
-      "decode_tps": 12.15,
-      "ttft_ms": 9422.0,
+      "prefill_tps": 54.19,
+      "decode_tps": 12.51,
+      "ttft_ms": 9448.0,
       "peak_ram_gb": 6.085,
-      "size_gb": 3.06
+      "size_gb": 3.06,
+      "ppl": 17.1097
     },
     {
       "model": "Qwen2.5-3B-Instruct",
@@ -175,11 +158,12 @@
       "threads": 4,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 107.87,
-      "decode_tps": 22.95,
-      "ttft_ms": 4746.4,
+      "prefill_tps": 107.72,
+      "decode_tps": 23.28,
+      "ttft_ms": 4752.9,
       "peak_ram_gb": 6.085,
-      "size_gb": 3.06
+      "size_gb": 3.06,
+      "ppl": 17.1097
     },
     {
       "model": "Qwen2.5-3B-Instruct",
@@ -188,11 +172,12 @@
       "threads": 1,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 7.36,
-      "decode_tps": 4.33,
-      "ttft_ms": 69594.4,
+      "prefill_tps": 7.32,
+      "decode_tps": 4.32,
+      "ttft_ms": 69964.7,
       "peak_ram_gb": 1.952,
-      "size_gb": 1.797
+      "size_gb": 1.797,
+      "ppl": 18.1105
     },
     {
       "model": "Qwen2.5-3B-Instruct",
@@ -201,11 +186,12 @@
       "threads": 2,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 14.69,
-      "decode_tps": 7.93,
-      "ttft_ms": 34862.4,
+      "prefill_tps": 14.6,
+      "decode_tps": 7.88,
+      "ttft_ms": 35066.8,
       "peak_ram_gb": 1.952,
-      "size_gb": 1.797
+      "size_gb": 1.797,
+      "ppl": 18.1105
     },
     {
       "model": "Qwen2.5-3B-Instruct",
@@ -214,63 +200,68 @@
       "threads": 4,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 29.16,
-      "decode_tps": 15.2,
-      "ttft_ms": 17556.0,
+      "prefill_tps": 29.05,
+      "decode_tps": 15.17,
+      "ttft_ms": 17624.2,
       "peak_ram_gb": 1.952,
-      "size_gb": 1.797
+      "size_gb": 1.797,
+      "ppl": 18.1105
     },
     {
       "model": "Qwen2.5-3B-Instruct",
       "quant": "Q4_K_M",
       "build": "kleidiai-off",
-      "threads": 1,
-      "n_prompt": 512,
-      "n_gen": 128,
-      "prefill_tps": 11.73,
-      "decode_tps": 5.0,
-      "ttft_ms": 43666.2,
-      "peak_ram_gb": 3.731,
-      "size_gb": 1.797
-    },
-    {
-      "model": "Qwen2.5-3B-Instruct",
-      "quant": "Q4_K_M",
-      "build": "kleidiai-off",
-      "threads": 2,
-      "n_prompt": 512,
-      "n_gen": 128,
-      "prefill_tps": 23.38,
-      "decode_tps": 9.42,
-      "ttft_ms": 21901.8,
-      "peak_ram_gb": 3.731,
-      "size_gb": 1.797
-    },
-    {
-      "model": "Qwen2.5-3B-Instruct",
-      "quant": "Q4_K_M",
-      "build": "kleidiai-off",
-      "threads": 4,
-      "n_prompt": 512,
-      "n_gen": 128,
-      "prefill_tps": 46.34,
-      "decode_tps": 17.66,
-      "ttft_ms": 11049.1,
-      "peak_ram_gb": 3.731,
-      "size_gb": 1.797
-    },
-    {
-      "model": "Qwen2.5-3B-Instruct",
-      "quant": "Q4_K_M",
-      "build": "kleidiai-on",
       "threads": 1,
       "n_prompt": 512,
       "n_gen": 128,
       "prefill_tps": 11.75,
+      "decode_tps": 5.09,
+      "ttft_ms": 43582.2,
+      "peak_ram_gb": 3.731,
+      "size_gb": 1.797,
+      "ppl": 18.1105
+    },
+    {
+      "model": "Qwen2.5-3B-Instruct",
+      "quant": "Q4_K_M",
+      "build": "kleidiai-off",
+      "threads": 2,
+      "n_prompt": 512,
+      "n_gen": 128,
+      "prefill_tps": 23.29,
+      "decode_tps": 9.37,
+      "ttft_ms": 21979.1,
+      "peak_ram_gb": 3.731,
+      "size_gb": 1.797,
+      "ppl": 18.1105
+    },
+    {
+      "model": "Qwen2.5-3B-Instruct",
+      "quant": "Q4_K_M",
+      "build": "kleidiai-off",
+      "threads": 4,
+      "n_prompt": 512,
+      "n_gen": 128,
+      "prefill_tps": 46.23,
+      "decode_tps": 17.59,
+      "ttft_ms": 11076.1,
+      "peak_ram_gb": 3.731,
+      "size_gb": 1.797,
+      "ppl": 18.1105
+    },
+    {
+      "model": "Qwen2.5-3B-Instruct",
+      "quant": "Q4_K_M",
+      "build": "kleidiai-on",
+      "threads": 1,
+      "n_prompt": 512,
+      "n_gen": 128,
+      "prefill_tps": 11.67,
       "decode_tps": 4.94,
-      "ttft_ms": 43566.4,
+      "ttft_ms": 43858.4,
       "peak_ram_gb": 3.731,
-      "size_gb": 1.797
+      "size_gb": 1.797,
+      "ppl": 18.1105
     },
     {
       "model": "Qwen2.5-3B-Instruct",
@@ -279,11 +270,12 @@
       "threads": 2,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 23.37,
-      "decode_tps": 9.38,
-      "ttft_ms": 21906.6,
+      "prefill_tps": 23.36,
+      "decode_tps": 9.37,
+      "ttft_ms": 21920.1,
       "peak_ram_gb": 3.731,
-      "size_gb": 1.797
+      "size_gb": 1.797,
+      "ppl": 18.1105
     },
     {
       "model": "Qwen2.5-3B-Instruct",
@@ -292,11 +284,12 @@
       "threads": 4,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 46.24,
-      "decode_tps": 17.67,
-      "ttft_ms": 11072.4,
+      "prefill_tps": 46.09,
+      "decode_tps": 17.57,
+      "ttft_ms": 11108.8,
       "peak_ram_gb": 3.731,
-      "size_gb": 1.797
+      "size_gb": 1.797,
+      "ppl": 18.1105
     },
     {
       "model": "Qwen2.5-3B-Instruct",
@@ -305,24 +298,26 @@
       "threads": 1,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 7.0,
-      "decode_tps": 4.06,
-      "ttft_ms": 73121.8,
-      "peak_ram_gb": 1.856,
-      "size_gb": 1.698
-    },
-    {
-      "model": "Qwen2.5-3B-Instruct",
-      "quant": "Q4_0",
-      "build": "repack-off",
-      "threads": 2,
-      "n_prompt": 512,
-      "n_gen": 128,
-      "prefill_tps": 14.05,
-      "decode_tps": 7.33,
-      "ttft_ms": 36434.8,
+      "prefill_tps": 6.89,
+      "decode_tps": 3.98,
+      "ttft_ms": 74298.7,
       "peak_ram_gb": 1.857,
-      "size_gb": 1.698
+      "size_gb": 1.698,
+      "ppl": 20.2735
+    },
+    {
+      "model": "Qwen2.5-3B-Instruct",
+      "quant": "Q4_0",
+      "build": "repack-off",
+      "threads": 2,
+      "n_prompt": 512,
+      "n_gen": 128,
+      "prefill_tps": 13.96,
+      "decode_tps": 7.17,
+      "ttft_ms": 36667.8,
+      "peak_ram_gb": 1.857,
+      "size_gb": 1.698,
+      "ppl": 20.2735
     },
     {
       "model": "Qwen2.5-3B-Instruct",
@@ -331,11 +326,12 @@
       "threads": 4,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 27.92,
-      "decode_tps": 13.95,
-      "ttft_ms": 18336.0,
+      "prefill_tps": 27.8,
+      "decode_tps": 13.74,
+      "ttft_ms": 18420.2,
       "peak_ram_gb": 1.856,
-      "size_gb": 1.698
+      "size_gb": 1.698,
+      "ppl": 20.2735
     },
     {
       "model": "Qwen2.5-3B-Instruct",
@@ -344,11 +340,12 @@
       "threads": 1,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 17.83,
-      "decode_tps": 5.81,
-      "ttft_ms": 28716.5,
+      "prefill_tps": 17.8,
+      "decode_tps": 5.72,
+      "ttft_ms": 28760.2,
       "peak_ram_gb": 3.536,
-      "size_gb": 1.698
+      "size_gb": 1.698,
+      "ppl": 20.2735
     },
     {
       "model": "Qwen2.5-3B-Instruct",
@@ -357,11 +354,12 @@
       "threads": 2,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 35.51,
-      "decode_tps": 10.35,
-      "ttft_ms": 14419.0,
+      "prefill_tps": 35.47,
+      "decode_tps": 10.28,
+      "ttft_ms": 14435.6,
       "peak_ram_gb": 3.536,
-      "size_gb": 1.698
+      "size_gb": 1.698,
+      "ppl": 20.2735
     },
     {
       "model": "Qwen2.5-3B-Instruct",
@@ -370,11 +368,12 @@
       "threads": 4,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 70.33,
-      "decode_tps": 19.6,
-      "ttft_ms": 7280.4,
+      "prefill_tps": 70.17,
+      "decode_tps": 19.32,
+      "ttft_ms": 7296.1,
       "peak_ram_gb": 3.536,
-      "size_gb": 1.698
+      "size_gb": 1.698,
+      "ppl": 20.2735
     },
     {
       "model": "Qwen2.5-3B-Instruct",
@@ -383,11 +382,12 @@
       "threads": 1,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 17.97,
-      "decode_tps": 5.89,
-      "ttft_ms": 28499.5,
+      "prefill_tps": 17.94,
+      "decode_tps": 5.96,
+      "ttft_ms": 28535.1,
       "peak_ram_gb": 3.536,
-      "size_gb": 1.698
+      "size_gb": 1.698,
+      "ppl": 20.2735
     },
     {
       "model": "Qwen2.5-3B-Instruct",
@@ -396,11 +396,12 @@
       "threads": 2,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 35.78,
-      "decode_tps": 10.58,
-      "ttft_ms": 14309.7,
+      "prefill_tps": 35.73,
+      "decode_tps": 10.49,
+      "ttft_ms": 14327.7,
       "peak_ram_gb": 3.536,
-      "size_gb": 1.698
+      "size_gb": 1.698,
+      "ppl": 20.2735
     },
     {
       "model": "Qwen2.5-3B-Instruct",
@@ -409,11 +410,12 @@
       "threads": 4,
       "n_prompt": 512,
       "n_gen": 128,
-      "prefill_tps": 70.81,
-      "decode_tps": 19.71,
-      "ttft_ms": 7230.2,
+      "prefill_tps": 70.85,
+      "decode_tps": 19.37,
+      "ttft_ms": 7226.8,
       "peak_ram_gb": 3.536,
-      "size_gb": 1.698
+      "size_gb": 1.698,
+      "ppl": 20.2735
     }
   ]
 }

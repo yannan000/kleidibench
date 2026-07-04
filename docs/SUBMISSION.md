@@ -58,9 +58,13 @@ Host: GitHub Actions `ubuntu-24.04-arm` (**Arm Neoverse N2**, 4 vCPU,
 
 | Model | KleidiAI vs naive (Q4_0, prefill / decode) | KleidiAI direct win (Q8_0 prefill) | Best decode tok/s | F16 → Q4_0 size |
 |-------|-------------------------------------------:|-----------------------------------:|------------------:|----------------:|
-| Qwen2.5-0.5B | 2.02× / 1.48× | — | 132.1 | 0.93 → 0.33 GB |
-| Qwen2.5-1.5B | 2.36× / 1.34× | — | 45.0 | 2.9 → 0.9 GB |
-| Qwen2.5-3B | **2.54× / 1.41×** | **1.73×** (62.5 → 107.9 tok/s) | 23.0 | 5.75 → 1.70 GB |
+| Qwen2.5-0.5B | ~2.0× / ~1.5× | 1.41× | 125.1 | 0.93 → 0.33 GB |
+| Qwen2.5-1.5B | ~2.4× / ~1.3× | 1.60× | 44.6 | 2.9 → 0.9 GB |
+| Qwen2.5-3B | **2.5× / 1.4×** | **1.73×** (62.2 → 107.7 tok/s) | 23.3 | 5.75 → 1.70 GB |
+
+Quality is measured too (perplexity, bundled corpus): on the 3B, **Q8_0 costs
+only +1.3% vs F16 while being the fastest config**; Q4_0 is 3.4× smaller at
++20%. The full size/speed/quality curve is in every report.
 
 The nuanced finding most entries won't have: at Q4_0, llama.cpp's *default*
 build already ships Arm repack kernels that match KleidiAI within 1% — the

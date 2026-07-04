@@ -89,7 +89,7 @@ def _markdown(rows: List[dict], price_per_hour: float) -> str:
     lines = [
         "# KleidiBench leaderboard",
         "",
-        f"Best configuration per model (highest decode tok/s, KleidiAI-on preferred). "
+        f"Best configuration per model (highest decode tok/s across all builds). "
         f"Host: {rows[0]['host'] if rows else '?'}.",
         "",
         f"| Rank | Model | Best config | Size (GB) | Prefill tok/s | Decode tok/s | "

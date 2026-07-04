@@ -12,9 +12,9 @@ What we measured on the 3B model at 4 threads:
 
 | Quant | KleidiAI OFF (default) | KleidiAI ON | Direct gain |
 |-------|-----------------------:|------------:|------------:|
-| Q4_0 prefill | 70.3 tok/s | 70.8 tok/s | 1.01× |
-| **Q8_0 prefill** | **62.5 tok/s** | **107.9 tok/s** | **1.73×** |
-| Q8_0 decode | 20.4 tok/s | 23.0 tok/s | 1.13× |
+| Q4_0 prefill | 70.2 tok/s | 70.9 tok/s | 1.01× |
+| **Q8_0 prefill** | **62.2 tok/s** | **107.7 tok/s** | **1.73×** |
+| Q8_0 decode | 20.3 tok/s | 23.3 tok/s | 1.15× |
 
 Why: llama.cpp's **default** aarch64 CPU backend already runtime-repacks Q4_0
 weights into blocked layouts and dispatches `i8mm`/dotprod GEMM kernels — so at
@@ -25,8 +25,9 @@ from one build flag.
 
 Practical takeaway: **if you serve Q8_0 on Arm, build with KleidiAI — it is
 free speed.** Q8_0+KleidiAI was the fastest configuration we measured for
-*every* model in the sweep (e.g. 3B: 23.0 tok/s decode vs 19.7 for Q4_0),
-while also being the highest-quality quant. If RAM allows, it dominates.
+*every* model in the sweep (e.g. 3B: 23.3 tok/s decode vs 19.4 for Q4_0),
+while also being the highest-quality quant (+1.3% perplexity vs F16 — see
+finding 4). If RAM allows, it dominates.
 
 ## 2. "Optimized for Arm" is mostly the repack path — and it's huge
 
@@ -61,20 +62,31 @@ time-to-first-token, but decode throughput saturates** — for chat workloads
 dominated by decode, several small Arm instances beat one big one at equal
 total cores.
 
-## 4. Quantization is still the biggest single lever
+## 4. Quantization is still the biggest single lever — and quality is measurable
 
-3B model, best build per quant, 4 threads:
+3B model, best build per quant, 4 threads, perplexity via `llama-perplexity`
+on a fixed corpus (lower = better; the delta vs F16 is what matters):
 
-| Quant | Size | Prefill | Decode | Peak RAM |
-|-------|-----:|--------:|-------:|---------:|
-| F16 | 5.75 GB | 23.6 | 10.7 | 5.9 GB |
-| Q8_0 (KleidiAI) | 3.06 GB | 107.9 | 23.0 | 6.1 GB |
-| Q4_0 (KleidiAI) | 1.70 GB | 70.8 | 19.7 | 3.5 GB |
+| Quant | Size | Prefill | Decode | Peak RAM | Perplexity (Δ vs F16) |
+|-------|-----:|--------:|-------:|---------:|----------------------:|
+| F16 | 5.75 GB | 23.4 | 10.9 | 5.9 GB | 16.88 (—) |
+| Q8_0 (KleidiAI) | 3.06 GB | 107.7 | 23.3 | 6.1 GB | 17.11 (**+1.3%**) |
+| Q4_K_M | 1.80 GB | 46.1 | 17.6 | 3.7 GB | 18.11 (+7.3%) |
+| Q4_0 (KleidiAI) | 1.70 GB | 70.9 | 19.4 | 3.5 GB | 20.27 (+20.1%) |
 
-F16 → Q4_0: **3.4× smaller, 3.0× faster prefill, 1.8× faster decode**. Note the
-RAM subtlety: Q8_0's *runtime* peak RAM is as high as F16-off-disk-size because
-of the repacked copies — on RAM-constrained hosts Q4_0 wins on footprint even
-though Q8_0 wins on speed.
+F16 → Q4_0: **3.4× smaller, 3.0× faster prefill, 1.8× faster decode** — at a
+real 20% perplexity cost. Two nuances the quality column exposes:
+
+- **Q8_0's quality is nearly free (+1.3%)** while also being the fastest config
+  measured (finding 1). If RAM allows, Q8_0+KleidiAI dominates on every axis
+  except footprint.
+- **Q4_K_M beats Q4_0 on quality (+7% vs +20%) but loses on speed** (no
+  repack/KleidiAI path for K-quants) — the classic K-quant tradeoff, now with
+  numbers on both sides.
+
+RAM subtlety: Q8_0's *runtime* peak RSS is as high as F16's because of the
+repacked weight copies — on RAM-constrained hosts Q4_0 wins on footprint even
+though Q8_0 wins on speed and quality.
 
 ## 5. Free CI runners are viable Arm benchmark hardware
 

@@ -33,23 +33,25 @@ no paid cloud, no persistent server required). No GPU. Just Arm CPUs, in CI.
 
 Model: `Qwen/Qwen2.5-3B-Instruct` · Host: GitHub Actions `ubuntu-24.04-arm` (**Arm Neoverse N2**, 4 vCPU, `i8mm`+`sve2`) · llama.cpp `d4cff114c` · 4 threads
 
-| Config | Size (GB) | Prefill tok/s | Decode tok/s | Peak RAM (GB) |
-|--------|----------:|--------------:|-------------:|--------------:|
-| F16 | 5.75 | 23.6 | 10.7 | 5.9 |
-| Q4_0 — naive (no Arm repack) | 1.70 | 27.9 | 14.0 | 1.9 |
-| Q4_0 — llama.cpp default Arm path | 1.70 | 70.3 | 19.6 | 3.5 |
-| Q4_0 — **KleidiAI** | 1.70 | 70.8 | 19.7 | 3.5 |
-| Q8_0 — KleidiAI **off** | 3.06 | 62.5 | 20.4 | 6.3 |
-| Q8_0 — **KleidiAI on** | 3.06 | **107.9** | **23.0** | 6.1 |
+| Config | Size (GB) | Prefill tok/s | Decode tok/s | Peak RAM (GB) | Perplexity |
+|--------|----------:|--------------:|-------------:|--------------:|-----------:|
+| F16 | 5.75 | 23.4 | 10.9 | 5.9 | 16.88 |
+| Q4_0 — naive (no Arm repack) | 1.70 | 27.9 | 14.0 | 1.9 | 20.27 |
+| Q4_0 — llama.cpp default Arm path | 1.70 | 70.2 | 19.3 | 3.5 | 20.27 |
+| Q4_0 — **KleidiAI** | 1.70 | 70.9 | 19.4 | 3.5 | 20.27 |
+| Q8_0 — KleidiAI **off** | 3.06 | 62.2 | 20.3 | 6.3 | 17.11 |
+| Q8_0 — **KleidiAI on** | 3.06 | **107.7** | **23.3** | 6.1 | **17.11** |
 
-Three honest takeaways:
+Four honest takeaways:
 
-- **KleidiAI's direct win is Q8_0: 1.73× prefill** (62.5 → 107.9 tok/s) — the fastest
+- **KleidiAI's direct win is Q8_0: 1.73× prefill** (62.2 → 107.7 tok/s) — the fastest
   config overall, because llama.cpp's default path doesn't repack Q8_0 and KleidiAI's
   `i8mm` kernels do.
-- **Arm-optimized kernels vs naive (Q4_0): 2.5× prefill, 1.4× decode** — at Q4_0,
-  llama.cpp's default already ships Arm repack kernels that match KleidiAI within 1%;
-  the 3-way build comparison keeps that visible instead of hiding it.
+- **Q8_0 quality is nearly free**: +1.3% perplexity vs F16, while Q4_0 costs +20%.
+  Fastest AND highest-quality quant — if RAM allows, Q8_0+KleidiAI dominates.
+- **Arm-optimized kernels vs naive: up to 3.3× prefill** — at Q4_0, llama.cpp's
+  default already ships Arm repack kernels that match KleidiAI within 1%; the 3-way
+  build comparison keeps that visible instead of hiding it.
 - **Quantization stacks on top: F16 → Q4_0 is 3.4× smaller and 3× faster prefill.**
 
 Full sweeps for Qwen2.5 0.5B / 1.5B / 3B (thread scaling, TTFT, RAM, all three builds)
