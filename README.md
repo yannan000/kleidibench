@@ -20,9 +20,28 @@ GitHub arm64 runner hands you the verdict for *your* model:
 | What does it cost? | **$/million-tokens** per config — the row a migration proposal needs |
 | Can I trust it? | 3-way methodology, run-to-run noise **measured at 0.54% median**, re-run by anyone with a GitHub account |
 
-Proof below: **9 models, 6 lineages, 0.5B→12B** — including architectures
-benchmarked *days after release*, before converter support existed. Every
-number from real Neoverse N2 silicon. No GPU. No cloud account. **$0.**
+## Three things in one repo
+
+**1 · The harness** — a reusable benchmark instrument, not a one-off study.
+`kleidibench run <any-hf-model>` orchestrates the whole experiment: three
+llama.cpp builds, the quant sweep (or pre-quantized GGUFs for day-one and
+oversize architectures), `llama-bench` + perplexity, dashboard reports. Plus a
+copy-paste **CI template** that turns any public repo into an Arm benchmark lab.
+
+**2 · The findings** — what the harness discovered when we ran it: 9 models,
+6 lineages, 0.5B→12B. KleidiAI's real win lives at **Q8_0 (1.73× prefill)**,
+not Q4_0 where on/off benchmarks usually look; a **~3B decode crossover** with
+workload guidance; repack's **2× RAM cost**; a **0.54% measured noise floor**.
+Six findings, all reproducible: [docs/FINDINGS.md](docs/FINDINGS.md).
+
+**3 · The live demo** — the numbers, running: an OpenAI-compatible
+`llama-server` on a free Arm runner, driven by a self-contained
+[chat UI](https://yannan000.github.io/kleidibench/demo/chat.html) that shows
+**TTFT and tok/s live under every response**, next to
+[interactive dashboards](https://yannan000.github.io/kleidibench/results/leaderboard.html)
+of every result.
+
+Every number from real Neoverse N2 silicon. No GPU. No cloud account. **$0.**
 
 > Submission for the **Arm Create: AI Optimization Challenge 2026**, Track 2 (Cloud AI).
 

@@ -111,17 +111,22 @@ report in one command, on hardware that costs nothing.**
 - **Learners** — the cheapest lab there is for "what does quantization
   actually trade?": a size/speed/quality curve on real hardware for $0.
 
-## Functionality / output
+## Functionality / output — three deliverables in one repo
 
-- **The tool**: `kleidibench` CLI (`run`, `sweep`, `leaderboard`, `info`) —
+**1 · The harness** (the reusable artifact) · **2 · The findings** (the
+measured claims) · **3 · The live demo** (the numbers, running):
+
+- **The harness**: `kleidibench` CLI (`run`, `sweep`, `leaderboard`, `info`) —
   MIT-licensed Python, dependency-light (PyYAML only), orchestrates upstream
-  llama.cpp binaries rather than reimplementing inference.
-- **The reports**: committed markdown + HTML artifacts under `results/`,
-  including a combined multi-model leaderboard ranked by decode tok/s with a
-  KleidiAI-gain column and $/Mtok cost model.
-- **The CI template**: `.github/workflows/benchmark.yml` — a reusable pattern
-  for running Arm performance tests on free arm64 runners (smoke test on every
-  push; full sweep on manual dispatch that commits results back).
+  llama.cpp binaries rather than reimplementing inference. Includes the
+  pre-quantized GGUF mode (day-one/oversize architectures) and the CI template
+  (`.github/workflows/benchmark.yml`) that turns any public repo into an Arm
+  benchmark lab — smoke test on every push, full sweeps on dispatch, results
+  committed back automatically.
+- **The findings**: committed dashboard artifacts under `results/` (per-model
+  reports + combined leaderboard: decode tok/s, KleidiAI gain, $/Mtok) and the
+  six-finding analysis in `docs/FINDINGS.md` — the Q8_0 1.73× win, the ~3B
+  decode crossover, repack's 2× RAM cost, the 0.54% noise floor.
 - **The live demo**: `llama.cpp`'s OpenAI-compatible server running the
   KleidiAI Q8_0 build (the measured-fastest config) on an arm64 runner, driven
   by a self-contained browser chat UI (`demo/chat.html`) showing live TTFT and
