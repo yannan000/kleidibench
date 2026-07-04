@@ -129,6 +129,8 @@ tmate · Arm Performix (optional deep profiling)
 ## Links
 
 - Repo: https://github.com/yannan000/kleidibench (public, MIT)
-- Findings writeup (learning-ready): [docs/FINDINGS.md](FINDINGS.md)
+- Live leaderboard: https://yannan000.github.io/kleidibench/results/leaderboard.html
+- Live 3B report (charts + thread scaling): https://yannan000.github.io/kleidibench/results/Qwen2.5-3B-Instruct/report.html
+- Findings writeup (learning-ready): https://github.com/yannan000/kleidibench/blob/main/docs/FINDINGS.md
 - Demo video: [[YOUTUBE LINK]]
 - CI runs (live benchmark evidence): https://github.com/yannan000/kleidibench/actions

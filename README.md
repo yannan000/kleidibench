@@ -59,6 +59,11 @@ in [results/](results/), including the combined [leaderboard](results/leaderboar
 The full analysis — including why on/off-only benchmarks get this wrong — is in
 **[docs/FINDINGS.md](docs/FINDINGS.md)**.
 
+**Live (GitHub Pages):**
+[interactive leaderboard](https://yannan000.github.io/kleidibench/results/leaderboard.html) ·
+[3B report with charts](https://yannan000.github.io/kleidibench/results/Qwen2.5-3B-Instruct/report.html) ·
+[demo chat UI](https://yannan000.github.io/kleidibench/demo/chat.html)
+
 ---
 
 ## Quick start
