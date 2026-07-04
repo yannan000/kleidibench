@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 250" font-family="ui-monospace,Menlo,monospace">
+<rect width="900" height="250" rx="14" fill="#111318" stroke="#2b3139"/>
+<text x="24" y="34" fill="#e2e2e8" font-size="17" font-weight="700">Demo video — 3:00 storyboard</text>
+<text x="24" y="54" fill="#889296" font-size="12">judges are not required to watch past 3:00 — the 1.73&#215; number lands in the first 20 seconds</text>
+<style>
+.seg{stroke:#111318;stroke-width:2}
+.t{fill:#889296;font-size:10px}
+.n{fill:#e2e2e8;font-size:12px;font-weight:700}
+.d{fill:#889296;font-size:10px}
+</style>
+
+<!-- timeline bar: 852px == 180s -->
+<rect class="seg" x="24"  y="86" width="95"  height="26" rx="5" fill="#0b7285"/>
+<rect class="seg" x="119" y="86" width="142" height="26" rx="5" fill="#66b2c2"/>
+<rect class="seg" x="261" y="86" width="189" height="26" rx="5" fill="#0b7285"/>
+<rect class="seg" x="450" y="86" width="237" height="26" rx="5" fill="#66b2c2"/>
+<rect class="seg" x="687" y="86" width="142" height="26" rx="5" fill="#0b7285"/>
+<rect class="seg" x="829" y="86" width="47"  height="26" rx="5" fill="#333539"/>
+
+<text class="t" x="24"  y="128">0:00</text>
+<text class="t" x="119" y="128">0:20</text>
+<text class="t" x="261" y="128">0:50</text>
+<text class="t" x="450" y="128">1:30</text>
+<text class="t" x="687" y="128">2:20</text>
+<text class="t" x="829" y="128">2:50</text>
+
+<text class="n" x="24"  y="160">1 · Hook</text>
+<text class="d" x="24"  y="176">report.html — the 1.73&#215; card</text>
+<text class="n" x="24"  y="196">2 · One command</text>
+<text class="d" x="24"  y="212">terminal: kleidibench run …</text>
+
+<text class="n" x="320" y="160">3 · Free Arm CI</text>
+<text class="d" x="320" y="176">Actions tab, uname -m = aarch64</text>
+<text class="n" x="320" y="196">4 · Live chat</text>
+<text class="d" x="320" y="212">chat.html — tokens stream + TTFT chips</text>
+
+<text class="n" x="620" y="160">5 · Leaderboard</text>
+<text class="d" x="620" y="176">9 models · 0.5B&#8594;12B · $0</text>
+<text class="n" x="620" y="196">6 · End card</text>
+<text class="d" x="620" y="212">repo URL + track</text>
+</svg>

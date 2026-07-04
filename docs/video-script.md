@@ -5,6 +5,19 @@ land **in the first 30 seconds**. Screen-record the terminal + browser
 (QuickTime on macOS records both), no music (copyright rule), voiceover or
 on-screen captions.
 
+![Storyboard timeline](assets/video-timeline.svg)
+
+## What's on screen, per scene
+
+| Scene | On screen | Asset (open before recording) |
+|-------|-----------|-------------------------------|
+| 1 Hook | Q8_0 gain card, cursor circling 1.73× | [3B report](https://yannan000.github.io/kleidibench/results/Qwen2.5-3B-Instruct/report.html) |
+| 2 One command | dark terminal, ≥16pt font | `kleidibench run Qwen/Qwen2.5-0.5B-Instruct` |
+| 3 Free Arm CI | Actions run log, `uname -m` → `aarch64` | [Actions tab](https://github.com/yannan000/kleidibench/actions) |
+| 4 Live chat | streaming tokens + TTFT/tok-s chips | [chat UI](https://yannan000.github.io/kleidibench/demo/chat.html) + local `llama-server` |
+| 5 Leaderboard | 9-model ladder, scroll the table | [leaderboard](https://yannan000.github.io/kleidibench/results/leaderboard.html) |
+| 6 End card | repo URL + track name, static 10s | make a title slide or use the README hero |
+
 ## Shot list
 
 ### 0:00–0:20 — The hook (report.html, already open)
@@ -58,9 +71,10 @@ zoom on that line.
 ### 2:20–2:50 — The leaderboard + close (browser: leaderboard.html)
 Show the multi-model leaderboard, scroll the table.
 
-> "Multiple models, one ranked leaderboard: decode speed, KleidiAI gain,
-> cost per million tokens. Everything is MIT-licensed and reproducible with
-> one command. KleidiBench: prove your LLM runs faster on Arm."
+> "Nine models, six lineages, half a billion to twelve billion parameters —
+> one ranked leaderboard: decode speed, KleidiAI gain, cost per million
+> tokens. Everything is MIT-licensed and reproducible with one command.
+> KleidiBench: prove your LLM runs faster on Arm."
 
 End card (2:50–3:00): repo URL `github.com/yannan000/kleidibench` + "Arm
 Create: AI Optimization Challenge 2026 — Track 2: Cloud AI".
