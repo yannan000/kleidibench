@@ -1,0 +1,20 @@
+# Gemma 4 E2B (2.3B effective) — completes the Gemma 4 ladder on the
+# leaderboard: E2B -> E4B -> 12B. Pre-quantized GGUFs (the HF->GGUF converter
+# can't parse Gemma 4's tokenizer config yet). Full 3-way build comparison +
+# perplexity per quant.
+#   Dispatch: Actions -> benchmark -> Run workflow -> config: configs/gemma4-e2b.yaml
+
+models:
+  - repo: unsloth/gemma-4-E2B-it-GGUF
+    name: gemma-4-E2B-it
+    gguf:
+      Q8_0: gemma-4-E2B-it-Q8_0.gguf
+      Q4_K_M: gemma-4-E2B-it-Q4_K_M.gguf
+      Q4_0: gemma-4-E2B-it-Q4_0.gguf
+
+threads:
+  - 1
+  - 2
+  - 4
+
+quality: true
