@@ -1,0 +1,108 @@
+{
+  "model": "gemma-4-12B-it",
+  "host": {
+    "arch": "aarch64",
+    "is_arm": true,
+    "cpu_model": "Arm Neoverse N2",
+    "cores": 4,
+    "total_ram_gb": 15.6,
+    "features": [
+      "asimddp",
+      "i8mm",
+      "sve",
+      "sve2",
+      "bf16"
+    ],
+    "has_dotprod": true,
+    "has_i8mm": true,
+    "has_sve": true
+  },
+  "meta": {
+    "llama_commit": "2d973636e",
+    "timestamp": "2026-07-04T07:27:22",
+    "n_prompt": 512,
+    "n_gen": 128,
+    "reps": 3,
+    "prequantized": true
+  },
+  "results": [
+    {
+      "model": "gemma-4-12B-it",
+      "quant": "Q4_0",
+      "build": "repack-off",
+      "threads": 2,
+      "n_prompt": 512,
+      "n_gen": 128,
+      "prefill_tps": 3.46,
+      "decode_tps": 1.99,
+      "ttft_ms": 147913.7,
+      "peak_ram_gb": 6.675,
+      "size_gb": 6.276
+    },
+    {
+      "model": "gemma-4-12B-it",
+      "quant": "Q4_0",
+      "build": "repack-off",
+      "threads": 4,
+      "n_prompt": 512,
+      "n_gen": 128,
+      "prefill_tps": 6.88,
+      "decode_tps": 3.85,
+      "ttft_ms": 74382.2,
+      "peak_ram_gb": 6.675,
+      "size_gb": 6.276
+    },
+    {
+      "model": "gemma-4-12B-it",
+      "quant": "Q4_0",
+      "build": "kleidiai-off",
+      "threads": 2,
+      "n_prompt": 512,
+      "n_gen": 128,
+      "prefill_tps": 8.24,
+      "decode_tps": 3.12,
+      "ttft_ms": 62125.4,
+      "peak_ram_gb": 12.727,
+      "size_gb": 6.276
+    },
+    {
+      "model": "gemma-4-12B-it",
+      "quant": "Q4_0",
+      "build": "kleidiai-off",
+      "threads": 4,
+      "n_prompt": 512,
+      "n_gen": 128,
+      "prefill_tps": 16.34,
+      "decode_tps": 5.82,
+      "ttft_ms": 31338.1,
+      "peak_ram_gb": 12.727,
+      "size_gb": 6.276
+    },
+    {
+      "model": "gemma-4-12B-it",
+      "quant": "Q4_0",
+      "build": "kleidiai-on",
+      "threads": 2,
+      "n_prompt": 512,
+      "n_gen": 128,
+      "prefill_tps": 8.28,
+      "decode_tps": 3.2,
+      "ttft_ms": 61833.6,
+      "peak_ram_gb": 12.727,
+      "size_gb": 6.276
+    },
+    {
+      "model": "gemma-4-12B-it",
+      "quant": "Q4_0",
+      "build": "kleidiai-on",
+      "threads": 4,
+      "n_prompt": 512,
+      "n_gen": 128,
+      "prefill_tps": 16.43,
+      "decode_tps": 5.97,
+      "ttft_ms": 31162.1,
+      "peak_ram_gb": 12.727,
+      "size_gb": 6.276
+    }
+  ]
+}
