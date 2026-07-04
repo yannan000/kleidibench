@@ -1,0 +1,26 @@
+# Same-parameter cohort: the 0.5B class (270M–700M), five architectures.
+# The size ladder conflates size with architecture; this cohort isolates the
+# architecture variable at fixed scale — "which small model should I deploy
+# on Arm?" Combined with the already-benched Qwen2.5-0.5B-Instruct, six
+# models. gemma-3-270m-it is gated (instant license accept; HF_TOKEN set);
+# a 401 there is isolated and doesn't affect the rest.
+#   Dispatch: Actions -> benchmark -> Run workflow -> config: configs/cohort-0.5b.yaml
+
+models:
+  - Qwen/Qwen3-0.6B                        # newest Qwen small — gen contrast vs Qwen2.5-0.5B
+  - HuggingFaceTB/SmolLM2-360M-Instruct
+  - ibm-granite/granite-4.0-350m           # IBM Granite 4
+  - LiquidAI/LFM2-700M                     # Liquid hybrid-conv arch
+  - google/gemma-3-270m-it                 # gated, instant approval
+
+quants:
+  - Q8_0
+  - Q4_K_M
+  - Q4_0
+
+threads:
+  - 1
+  - 2
+  - 4
+
+quality: true
