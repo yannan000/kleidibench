@@ -1,13 +1,19 @@
 # Cross-family sweep — models available immediately (all ungated).
-# A failed model doesn't abort the sweep, so if llama.cpp's converter doesn't
-# support Gemma 4's arch yet, the other two still land and we swap in
-# gemma-3-4b-it as fallback.
+# Gemma 4 E4B goes through the pre-quantized GGUF path: the HF->GGUF converter
+# can't parse its tokenizer config yet (transformers too old for the arch),
+# which killed the E4B leg of the first run. unsloth's ready-made GGUFs skip
+# the converter entirely. No F16/perplexity baseline for E4B in this mode.
 #   Dispatch: Actions -> benchmark -> Run workflow -> config: configs/crossfamily.yaml
 
 models:
   - HuggingFaceTB/SmolLM2-1.7B-Instruct
   - microsoft/Phi-3.5-mini-instruct   # 3.8B
-  - google/gemma-4-E4B-it             # Gemma 4, 4.5B effective — benched last
+  - repo: unsloth/gemma-4-E4B-it-GGUF # Gemma 4, 4.5B effective — prequantized
+    name: gemma-4-E4B-it
+    gguf:
+      Q8_0: gemma-4-E4B-it-Q8_0.gguf
+      Q4_K_M: gemma-4-E4B-it-Q4_K_M.gguf
+      Q4_0: gemma-4-E4B-it-Q4_0.gguf
 
 quants:
   - Q8_0

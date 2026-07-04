@@ -111,14 +111,17 @@ jobs:
           CONFIG: ${{ github.event.inputs.config }}
         run: kleidibench sweep "$CONFIG"
 
+      # always(): a sweep that fails on one model still produced reports for
+      # the others — losing them stranded 2 models' results once.
       - name: Upload report artifact
+        if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
           name: kleidibench-full-report
           path: results/**
 
       - name: Commit results back to repo
-        if: ${{ github.event.inputs.commit_results == 'true' }}
+        if: ${{ always() && github.event.inputs.commit_results == 'true' }}
         # Rebase before pushing: main may have moved during a multi-hour sweep,
         # and a non-fast-forward reject at the last step wastes the whole run.
         run: |
