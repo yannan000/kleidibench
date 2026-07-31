@@ -49,6 +49,38 @@ Every number from real Neoverse N2 silicon. No GPU. No cloud account. **$0.**
 
 ---
 
+## The optimization story — baseline → changes → result
+
+**What was optimized:** LLM inference (prefill + decode) on an Arm Neoverse N2
+CPU. Worked example below is Qwen2.5-3B; the same recipe is replicated across
+12 more models.
+
+| | Configuration | Size | Prefill | Decode | Quality (PPL) |
+|---|---|---:|---:|---:|---:|
+| **Baseline** | F16 weights, stock llama.cpp — the model as downloaded | 5.75 GB | 23.4 t/s | 10.9 t/s | 16.88 |
+| **Optimized** | Q8_0 + KleidiAI `i8mm` kernels + tuned threads | 3.06 GB | **107.7 t/s (4.6×)** | **23.3 t/s (2.1×)** | 17.11 (+1.3%) |
+
+Three deliberate technical changes produce that delta, each isolated and
+measured separately:
+
+1. **Quantization choice — Q8_0, not the reflexive Q4_0** (23.4 → 62.2 t/s
+   prefill, 2.7×). Measured to be the fastest quant on this silicon at only
+   +1.3% perplexity vs F16 — where Q4_0 costs +20%.
+2. **KleidiAI microkernels — `GGML_CPU_KLEIDIAI=ON`** (62.2 → 107.7 t/s,
+   1.73×). Routes Q8_0 matmuls to i8mm block-repacked kernels the default
+   build doesn't have at this quant. One CMake flag.
+3. **Thread tuning** — prefill scales ~linearly to all 4 vCPUs, decode
+   saturates earlier; the sweep finds the knee per model instead of guessing.
+
+Every step is a `llama-bench` number (3 builds × quant sweep × 3 thread
+counts, 0.54% median run-to-run noise), the KleidiAI gain reproduces across
+**all 10 architectures measured (1.23–1.94×)**, and the
+[live demo](https://yannan000.github.io/kleidibench/demo/chat.html) serves
+exactly this optimized configuration. The rest of the repo is that recipe
+turned into an instrument anyone can point at their own model.
+
+---
+
 ## The results — 13 models, 7 lineages, 0.35B → 12B
 
 Every row measured on the same free runner; full sweeps (all quants, all three

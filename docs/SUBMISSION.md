@@ -22,7 +22,18 @@ Cloud AI (Track 2)
 
 ## Project overview
 
-**The real blocker to Arm adoption isn't speed — it's uncertainty.** Arm cloud
+**What we optimized:** CPU LLM inference on Arm Neoverse N2 — from 23.4 tok/s
+prefill / 10.9 tok/s decode (F16, stock llama.cpp: the model as downloaded) to
+**107.7 / 23.3 tok/s on Qwen2.5-3B: 4.6× prefill, 2.1× decode, at +1.3%
+perplexity** — via three deliberate, individually measured technical changes:
+quantization choice (Q8_0, the measured-fastest quant, not the reflexive
+Q4_0), KleidiAI's i8mm microkernels (`GGML_CPU_KLEIDIAI=ON`, +73% prefill from
+one CMake flag), and per-model thread tuning. Then we packaged the instrument
+that found that recipe, so any developer can reproduce the optimization for
+*their* model in one $0 CI run — and verified the recipe holds across 10
+architectures (1.23–1.94× kernel gain).
+
+**Why that matters — the real blocker to Arm adoption isn't speed, it's uncertainty.** Arm cloud
 is marketed as 30–40% cheaper per vCPU, but teams don't capture that saving
 because *"will OUR model perform?"* costs an engineer-week to answer properly:
 build variants, quantize, control the variables, chase OOMs, interpret.
@@ -54,11 +65,23 @@ common in this space (it's what surfaced the Q8_0 finding below). A benchmark
 result, a de-risking instrument, and permanent ecosystem infrastructure — in
 one repo.
 
-## Measured results
+## Measured results — baseline → optimized
 
 Host: GitHub Actions `ubuntu-24.04-arm` (**Arm Neoverse N2**, 4 vCPU,
 `dotprod`+`i8mm`+`sve2`) · llama.cpp `d4cff114c` · 3 quants × 3 builds ×
 1/2/4 threads × 3 reps per model
+
+The end-to-end optimization on the worked example (Qwen2.5-3B), each step
+isolated by the 3-way build design:
+
+| | Configuration | Size | Prefill | Decode | Perplexity |
+|---|---|---:|---:|---:|---:|
+| Baseline | F16, stock llama.cpp (model as downloaded) | 5.75 GB | 23.4 t/s | 10.9 t/s | 16.88 |
+| + quantize to Q8_0 | fastest measured quant, near-free quality | 3.06 GB | 62.2 t/s | 20.3 t/s | 17.11 |
+| + KleidiAI kernels | `GGML_CPU_KLEIDIAI=ON` (i8mm repack) | 3.06 GB | **107.7 t/s** | **23.3 t/s** | 17.11 |
+| **Net** | three changes, all measured | **1.9× smaller** | **4.6×** | **2.1×** | **+1.3%** |
+
+The same kernel gain, replicated across model scale:
 
 | Model | KleidiAI vs naive (Q4_0, prefill / decode) | KleidiAI direct win (Q8_0 prefill) | Best decode tok/s | F16 → Q4_0 size |
 |-------|-------------------------------------------:|-----------------------------------:|------------------:|----------------:|
@@ -126,10 +149,11 @@ measured claims) · **3 · The live demo** (the numbers, running):
   committed back automatically.
 - **The findings**: committed dashboard artifacts under `results/` (per-model
   reports + combined leaderboard: decode tok/s, KleidiAI gain, $/Mtok) and the
-  six-finding analysis in `docs/FINDINGS.md` — the Q8_0 1.73× win, the ~3B
+  seven-finding analysis in `docs/FINDINGS.md` — the Q8_0 1.73× win, the ~3B
   decode crossover, repack's 2× RAM cost, the 0.54% noise floor.
-- **The live demo**: `llama.cpp`'s OpenAI-compatible server running the
-  KleidiAI Q8_0 build (the measured-fastest config) on an arm64 runner, driven
+- **The live demo**: `llama.cpp`'s OpenAI-compatible server serving the
+  **optimized configuration from the story above** (Q8_0 + KleidiAI, the
+  measured-fastest config) on an arm64 runner, driven
   by a self-contained browser chat UI (`demo/chat.html`) showing live TTFT and
   tok/s per response, or the terminal client (`demo/demo_client.py`)
   (`demo-session.yml` opens the interactive session).
